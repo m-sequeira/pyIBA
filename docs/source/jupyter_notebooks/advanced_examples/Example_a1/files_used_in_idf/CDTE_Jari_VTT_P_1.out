@@ -1,0 +1,109 @@
+             ***  GUPIX (GUelph PIXe): Thick Target Matrix Calc  ***
+           Windows GUPIX Version 2.2.0         Last Update: 2011-08-29
+ Time: 12:42:48                *** Results ***           Date (y-m-d): 17-11-10
+
+ File:CDTE_Jari_VTT_P_1.spo       ID:                               
+ Chi**2= 3.738      ( 5.377    )  Total counts:  621708  %RMS sys err= 8.672    
+ Total # of loops:   1                 Total fit time:    0.0 seconds.
+ Fit region has 1721 chan ( 300 to 2020).  File has 2048 channels.
+ The detector resolution at the 5.9 keV line is  135.3 eV  (180.)
+ Thick PIXE spectrum acquired(0-0-0 @ 0:00:00) for      0s.
+     Matrix   Average count rate(cps):     0.0   Average current(nA):   0.000
+ H: 1.200E-02                          Angle(Beam-Target normal) Alpha=  0
+ Charge: 1.000E+00                          (Detector- "    "  ) Theta= 30
+ The matrix composition was iterated.
+    Proton energy(keV):  2300 Exit keV:     0 Layer thickness(ug/cm2): 1.966E+04
+ Depth fraction:0.000          Density(gm/cm3): 0.000
+ Matrix ( 8) elmts (Z,ppt): (24,   9.1) (25,   6.8) (26,  31.2) (28, 887.4)
+    (29,  19.5) (42,   1.3) (74,  44.7) (75,   0.0)
+ Looking for  8 elmts:  Cr K , Mn K , Fe K , Ni K , Cu K , Mo K , W  LA, Re LA
+ Filters (Z,um,hole fraction):  1               Fractional absorber error:0.000
+(100,350,0)
+ Special filter materials (100:Mylar)                                                               
+ Detector efficiency correction of relative intensities: Off
+ Use theoretical proton induced x-ray cross-sections for K,L&M x-rays.
+
+           Peak and spectrum description:
+ Peak centroid = A1+A2*E+A3*E**2            A(1,2,3):   72.221   96.142  0.0000
+ Peak width = SQRT(A4+A5*E)                   A(4,5):   2.1294   4.8192
+ With these values the fit region extends from   2.37 to  20.26 keV with FWHM
+ at center being  184.3 eV or 17.72 channels.  Excluding pile-up & escape the
+ elements have peaks ranging from   5.341 to  19.967 keV.
+
+ Background handled by Auto (Constant) digital filter (m-n-m): ( 9-18- 9)
+ Basic peak shape: Gaussian below & Voigtian above peak heights = 1000
+ Peak plateau: Energy dependent parameterized plateau in use.
+ Short step: None.
+ Peak tailing: 2 energy dependent parameterized tails per peak.
+ Matrix abs. edges: None.
+ Si escape energy in keV:  1.742
+ Minimum background value for LOD calc:    1
+ Statistical + Systematic channel weighting used -
+     Rel.Int. error:0.010              Absorber error:0.010
+     KMM R.A. error in use ? T         Tail error in use ? F
+ Pile-up [99(PU S )] peaks - #allowed: 50,  #used:  9
+
+ Stopping criteria: STEP:0.0010    LOOPS:  30
+ Total # of pars., fixed pars. & their IDs: (14, 1)  3
+ ##############################################################################
+  Note: ID/n,  n=(F:filter, S:surface, n:layer number)
+  #   ID     FINAL VALUE  INIT. VALUE     ERROR     %ERROR LAST CHANGE  %CHANGE
+  -   --     -----------  -----------     -----     ------ -----------  -------
+  1            72.2206      72.2203      2.862E-03    0.00   2.563E-04     0.00
+  2            96.1415      96.1415      3.848E-04    0.00   4.452E-05     0.00
+  3           0.000000     0.000000      0.000        0.00   0.000         0.00
+  4            2.12940      2.13508      3.081E-02    1.45  -5.677E-03    -0.27
+  5            4.81920      4.82003      4.129E-03    0.09  -8.281E-04    -0.02
+  6 Cr K / 1   280.441      280.435       5.03        1.79   0.109         0.04
+  7 Mn K / 1   239.083      239.069       5.47        2.29   2.365E-03     0.00
+  8 Fe K / 1   1221.09      1220.44       10.2        0.84  -4.224E-02     0.00
+  9 Ni K / 1   18955.7      18948.3       45.3        0.24    4.29         0.02
+ 10 Cu K / 1   339.743      340.128       8.69        2.56   0.431         0.13
+ 11 Mo K / 1  0.703603     0.703684      0.386       54.88  -5.120E-02    -7.28
+ 12 W  LA/ 1   115.669      115.934       4.43        3.83  -0.412        -0.36
+ 13 Re LA/ 1  0.000000     0.100000       2.11        0.00  -0.100         0.00
+ 14 PU S1/ 0   49.5131      49.5165       2.06        4.16  -2.702E-02    -0.05
+-------------------------------------------------------------------------------
+      Elmt  Lay   DF     Peak     2-FWHM       % Fit  % Stat. +1% Of     LOD
+  #   Z Sym.     n/m     Area       Area       Error   Error Overlap    Area
+  -   - ----     ---     ----       ----       -----   ----- -------    ----
+  1: 24 CrK / 1 18/ 9   3735.      5570.        1.80    1.55    1.60    49.1 
+  2: 25 MnK / 1 18/ 9   3313.      4936.        2.29    1.85    2.21   130.3 
+  3: 26 FeK / 1 18/ 9  1.7582E+04 2.6120E+04    0.84    0.69    0.74   139.5 
+  4: 28 NiK / 1 18/ 9  2.9355E+05 4.3469E+05    0.26    0.16    0.16    55.9 
+  5: 29 CuK / 1 18/ 9   5447.      8112.        2.56    2.12    4.24   252.1 
+  6: 42 MoK / 1 18/ 9   16.39      23.83       54.88   39.93   39.93    10.5 
+  7: 74 W LA/ 1 18/ 9   1892.      2063.        3.83   11.84   35.80   919.8 
+  8: 75 ReLA/ 1 18/ 9  0.0000     0.0000        0.00    0.00    0.00    48.0 
+-------------------------------------------------------------------------------
+ Z=99 is a pile-up "element".  Up to 50 such peaks were allowed in the fit and
+ the program used  9 of them.  Below are listed the pile-up energies and
+ intensities.   (Total Cts:   621708  Live time:    1.0s   Av Rate:621708 cps)
+  (Tau:  500. ns,   Pulse deadtime: 25. us, % Live time: 100.0  PUcor: 1.0068 )
+ Energy:  14.945 15.735 13.873 15.515 16.525 13.374 12.884 14.531 14.663
+ Rel Int: 1.0000 0.3436 0.1197 0.0387 0.0295 0.0259 0.0254 0.0217 0.0206
+-------------------------------------------------------------------------------
+ File:CDTE_Jari_VTT_P_1.spo   Sec:    0.  uC:  1.000  nA:  0.000  PUcor:1.0068
+ The last column is a decision on the presence of that element in the spectrum.
+   Y: present at level of quantization,   N: not present at limit of detection
+   ?: may be present near LOD levels (user must decide)  H or uC Corr[T]: 0.038
+ Det Res(eV): 135.3                                Chi**2:    3.738 (    5.377)
+       Layer         H   Yield Det. Filter
+ Element     Area  value  /uC/ Eff. Trans.     Conc.  %Stat.  %Fit      LOD
+  Z Sym  #  counts ( -4)   ppm (-3)  (-5)       ppm    Error  Error     ppm 
+  - ---  -  ------ ----- ----- ---- ------     -----   -----  -----    -----  -
+ 24 CrK  1  3734.6   120  2559 1000  35005    9110.8    1.60   1.80     99.8  Y
+ 25 MnK  1  3312.8   120  2387 1000  44555    6807.1    2.21   2.29    224.0  Y
+ 26 FeK  1 17582.0   120  2312 1000  53329   31166.5    0.74   0.84    208.3  Y
+ 28 NiK  1  293547   120  1069 1000  67606  887596.6    0.16   0.26    143.8  Y
+ 29 CuK  1  5447.2   120 836.1 1000  73144   19466.7    4.24   2.56    760.9  Y
+ 42 MoK  1    16.4   120 27.82 1000  96982    1327.6   39.93  54.88    796.5  ?
+ 74 W LA 1  1892.4   120 122.1 1000  75987   44563.9   35.80   3.83  25228.6  ?
+ 75 ReLA 1       0   120 117.7 1000  77830         0       0      0   1506.3  N
+ In the matrix iteration section it was found that a correction needed to be
+ applied to the H or uC value in order for the concentrations to sum to unity.
+ The concentrations listed in the table above include this correction value.
+ With the user supplied H & uC values alone the conc would be the above values
+ multiplied by  3.839E-02 (See the documentation for further discussion.)
+
+-------------------------------------------------------------------------------

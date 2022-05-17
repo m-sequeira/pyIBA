@@ -1,0 +1,18 @@
+ Starting time: 17: 5:42
+
+ Allocated variables based on: nspec=  1 ngeom=  1 nmols= 3 nels= 4
+ nelstot_final= 4 inlays= 2000 icross= 1000 innstop=20000
+ nchcompr_max= 1024 nener_foil= 2000
+
+
+ Initialising parameters sample 1: Co_015_Pt_0851.dat                      
+ Co_015_Pt_0851.geo last channel in fit ROI corrected to maximum value  1024
+ Gain in geometry  1 Co_015_Pt_0851.geo   changes: F
+ Offset in geometry  1 Co_015_Pt_0851.geo   changes: F
+ Charge in geometry  1 Co_015_Pt_0851.geo changes: F
+ Geometry   1 Co_015_Pt_0851.geo   has Gaussian straggling
+ WARNING: Problem with data file Co_015_Pt_0851.dat             CHECK IT
+ File Co_015_Pt_0851.dat             has a problem with real/livetime
+ Smoothing the data
+ Reading initial/simulated depth profile from ndf.prf
+ Ending   time: 17: 5:44
