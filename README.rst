@@ -47,10 +47,12 @@ Installation
    $ pip3 install pyIBA
 
 .. note::
-    Usually, pip3 is used to install Python3 packages while pip is used to install Python2 libraries. However in some environments the command pip may point to pip3, just as python may point to Python3. You can use ``which pip`` to check this.
+   Usually, pip3 is used to install Python3 packages while pip is used to install Python2 libraries. However in some environments the command pip may point to pip3, just as python may point to Python3. You can use ``which pip`` to check this.
 
-Alternatively, one can donwload the source files from `GitHub <http://github.com/m-sequeira/pyIBA>`_ and add the library folder to *sys.path* using::
-   
+Alternatively, one can donwload the source files from `GitHub <http://github.com/m-sequeira/pyIBA>`_ and add the library folder to *sys.path* using:
+
+.. code-block:: python
+
    import sys
    sys.path.insert(0, '/path/to/pyIBA/')
 
