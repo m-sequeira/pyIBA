@@ -21,7 +21,7 @@ To solve this issue and broaden the adoption of IDF, we developed **pyIBA** with
   * jupyter notebooks for data analysis and automation (see Example 1);
   * PyQt5 to make GUIs (see the closely related project `**IBA Studio** <https://github.com/m-sequeira/IBA-Studio>`_);
   * Flash, Django for web integration;
-  * TensorFlow for Machine Learning applications (see Example 2).
+  * TensorFlow for Machine Learning applications (see `Example A4 <https://pyiba.readthedocs.io/en/latest/jupyter_notebooks/advanced_examples/Example_a4/ML_pyIBA.html>`_).
 
 
 .. note::
