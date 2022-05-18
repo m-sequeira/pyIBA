@@ -1795,7 +1795,7 @@ def run_ndf_windows(idf_file):
 	cmd = cwd + ndf_path + ' ' + file + ' ' + ndf_flags
 	path_bat = path + 'ndf.bat'
 
-	print(cmd)
+	# print(cmd)
 	with open(path_bat,'w') as file:
 		file.write('@echo off \n')
 		file.write('cd ' + path + '\n')
@@ -1842,7 +1842,7 @@ def run_ndf_linux(idf_file):
 	cmd = wine + ' ' + cwd + ndf_path + ' ' + file + ' ' + ndf_flags
 	path_bat = path + 'ndf.bat'
 	# print(path)
-	print(cmd)
+	# print(cmd)
 	with open(path_bat,'w') as file:
 		file.write('cd ' + path + '\n')
 		file.write(cmd + '\n')

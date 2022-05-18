@@ -26,7 +26,7 @@ Alternatively, one can donwload the source files from `GitHub <http://github.com
 Examples
 ========
 
-Below is a series of examples/tutorials showcasing the use of **pyIBA**. All of them are made using jupyter Notebooks and thus can be downloaded, edited and tested on your computer. They can be found in the project's documentation folder (`pyIBA <https://github.com/m-sequeira/pyIBA/docs/jupyter_notebooks>`_). 
+Below is a series of examples/tutorials showcasing the use of **pyIBA**. All of them are made using jupyter Notebooks and thus can be downloaded, edited and tested on your computer. They can be found in the project's documentation folder (`pyIBA <https://github.com/m-sequeira/pyIBA/tree/master/docs/source/jupyter_notebooks>`_). 
 
 
 .. note::

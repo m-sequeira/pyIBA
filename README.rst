@@ -30,7 +30,7 @@ To solve this issue and broaden the adoption of IDF, we developed **pyIBA** with
 Head to
 
 - `Why adopt a standardised format? <https://pyiba.readthedocs.io/en/latest/#why-adopt-a-standardised-format>`_ for more information on the IDF format 
-- `Installation <https://pyiba.readthedocs.io/en/latest/using_pyIDF.html#installation>`_ page to start using IDF
+- `Installation <https://pyiba.readthedocs.io/en/latest/using_pyIBA.html#installation>`_ page to start using IDF
 - `API <https://pyiba.readthedocs.io/en/latest/API.html#api>`_  for a full list of the methods in each class, their documentation and some examples of their use.
 - `Basic Examples <https://pyiba.readthedocs.io/en/latest/using_pyIBA.html#basic-examples>`_  for everyday examples and an introduction to the **pyIBA** environment
 - `Advanced Examples <https://pyiba.readthedocs.io/en/latest/using_pyIBA.html#advanced-examples>`_ for more advanced examples and how to run **NDF** from **pyIBA**
