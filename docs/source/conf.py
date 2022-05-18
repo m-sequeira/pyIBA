@@ -77,7 +77,8 @@ exclude_patterns = ['jupyter_notebooks/ignore_nb',
 html_theme = 'classic' #'agogo' #'classic' #'sphinxdoc' #'alabaster'
 html_theme_options = {
     # "headerbg": "linear-gradient(0deg, rgba(81,120,187,1) 26%, rgba(27,40,62,1) 100%)"
-    "stickysidebar": True
+    "stickysidebar": True,
+    "sticky_navigation": True
 }
 
 
