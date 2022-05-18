@@ -17,6 +17,7 @@ To solve this issue and broaden the adoption of IDF, we developed **pyIBA** with
 * it is very verbose and self-explanatory;
 * it completely avoids the need for the user to master XML libraries when working with IDF;
 * being a python library, it allows for easy integration with other programming languages as well as with several modern technologies, such as:
+  
   * jupyter notebooks for data analysis and automation (see Example 1);
   * PyQt5 to make GUIs (see the closely related project `**IBA Studio** <https://github.com/m-sequeira/IBA-Studio>`_);
   * Flash, Django for web integration;
