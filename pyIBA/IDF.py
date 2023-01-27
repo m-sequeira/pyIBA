@@ -91,26 +91,3 @@ class IDF(main_idf, NDF):
 
 	def copy(self):
 		return deepcopy(self)
-		
-
-
-
-
-	
-	
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

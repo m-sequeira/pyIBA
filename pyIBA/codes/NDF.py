@@ -132,8 +132,8 @@ class NDF():
 		yaxis_entry = self.create_tree_on_parent(['yaxis'], data_entry, prefix = 'ndf:')
 		self.change_node_value('energy', xaxis_entry	, 'ndf:axisname')
 		self.change_node_value('channel', xaxis_entry	, 'ndf:axisunit')
-		self.change_node_value('energy', yaxis_entry	, 'ndf:axisname')
-		self.change_node_value('channel', yaxis_entry	, 'ndf:axisunit')
+		self.change_node_value('yield', yaxis_entry	    , 'ndf:axisname')
+		self.change_node_value('counts', yaxis_entry	, 'ndf:axisunit')
 
 		# data_entry = self.create_tree_on_parent(['ndf','fitresults','data', 'simpledata'], spectrum_entry, prefix = 'ndf:')
 		
@@ -146,11 +146,44 @@ class NDF():
 		self.change_node_value(x_string, data_entry, 'ndf:x')
 		self.change_node_value(y_string, data_entry, 'ndf:y')
 
+	def set_elemental_spectrum_data_fit_result(self, data, spectra_id = 0, simulation_id = 0):
+		simulation_entry = self.get_simulation(spectra_id=spectra_id, simulation_id = simulation_id)
+		data_entry = self.create_tree_on_parent(['ndf','fitresults','data', 'elementaldata'], simulation_entry, prefix = 'ndf:')
+
+		# x axis will always be shared between the elemental spectra
+		xaxis_entry = self.create_tree_on_parent(['xaxis'], data_entry, prefix = 'ndf:')
+		self.change_node_value('energy' , xaxis_entry, 'ndf:axisname')
+		self.change_node_value('channel', xaxis_entry, 'ndf:axisunit')
+
+		data_x = [str(s) for s in data['x']]
+		x_string = ' '.join(data_x)
+		self.change_node_value(x_string, data_entry, 'ndf:x')
+
+
+
+		for k, yelement in data.items():
+			if k == 'x':
+				continue
+
+			element_entry = self.create_element(data_entry, 'ndf:element')
+			self.change_node_value(k, element_entry, 'ndf:elementname')
+			yaxis_entry = self.create_tree_on_parent(['yaxis'], element_entry, prefix = 'ndf:')
+			self.change_node_value('yield' , yaxis_entry	, 'ndf:axisname')
+			self.change_node_value('counts', yaxis_entry	, 'ndf:axisunit')
+
+			# data_entry = self.create_tree_on_parent(['ndf','fitresults','data', 'simpledata'], spectrum_entry, prefix = 'ndf:')
+			
+			data_y = [str(s) for s in yelement]
+			
+			y_string = ' '.join(data_y)
+
+			self.change_node_value(y_string, yaxis_entry, 'ndf:y')
+
 
 	def get_dataxy_fit(self, spectra_id = 0, simulation_id = 0):
 		technique = self.get_technique(spectra_id=spectra_id)
 		if technique in ['RBS', 'NRA', None]:
-			type_data = 'simpledata'
+			type_data = 'ndf:simpledata'
 			x_tag = 'ndf:x'
 			y_tag = 'ndf:y'
 		elif technique == 'PIXE':
@@ -162,12 +195,15 @@ class NDF():
 		else:
 			return [0], [0]
 
-
-
 		simulation_entry = self.get_simulation(spectra_id = spectra_id, simulation_id=simulation_id)
-		
-		xx = get_xml_section(simulation_entry, x_tag)
-		yy = get_xml_section(simulation_entry, y_tag)
+		total_fit_entry = get_xml_section(simulation_entry, type_data)
+		if total_fit_entry is None: 
+			return [0], [0]
+		else:
+			total_fit_entry = total_fit_entry[0]
+
+		xx = get_xml_section(total_fit_entry, x_tag)
+		yy = get_xml_section(total_fit_entry, y_tag)
 		
 		if xx is None or yy is None: return None, None
 		
@@ -179,6 +215,45 @@ class NDF():
 		yy = nparray(yy).astype('float')
 
 		return xx, yy
+
+
+	def get_elemental_dataxy_fit(self, spectra_id = 0, simulation_id = 0):
+		technique = self.get_technique(spectra_id=spectra_id)
+		if technique in ['RBS', 'NRA', None]:
+			type_data = 'ndf:elementaldata'
+			x_tag = 'ndf:x'
+			y_tag = 'ndf:y'
+		else:
+			return [0], [0]
+
+
+		simulation_entry = self.get_simulation(spectra_id = spectra_id, simulation_id=simulation_id)
+		elements_fit_entry = get_xml_section(simulation_entry, type_data)
+
+		if elements_fit_entry is None: 
+			return {'x':[]}
+		else:
+			elements_fit_entry = elements_fit_entry[0]
+
+
+		# if xx is None or yy is None: return None, None
+
+		xx = get_xml_section(elements_fit_entry, x_tag)
+		xx = xx[0].firstChild.nodeValue.split()
+		xx = nparray(xx).astype('float')
+
+		data = {'x': xx}
+
+		element_entry = get_xml_section(elements_fit_entry, 'ndf:element')
+		for ele_fit in element_entry:
+			name = get_xml_section(ele_fit, 'ndf:elementname')[0].firstChild.nodeValue
+			yy = get_xml_section(ele_fit, y_tag)		
+			yy = yy[0].firstChild.nodeValue.split()
+			yy = nparray(yy).astype('float')
+
+			data[name] = yy
+
+		return data
 
 
 
@@ -1163,17 +1238,21 @@ class NDF():
 		sim_group, file_id = self.get_simulation_group(spectra_id = spectra_id)
 		if sim_group == -1:
 			return
-		
+
+		# load total fit		
 		res_filename = '%sf%s.dat' %(self.file_name[:3], file_id)
+		data_x, data_y_given, data_y_fit = read_spectra_fit_file(self.path_dir + res_filename)
 
-		data = loadtxt(self.path_dir + res_filename, skiprows = 7)
+		self.set_spectrum_data_fit_result(data_x, data_y_fit, spectra_id = spectra_id, simulation_id = simulation_id)
 
-		data_x = data[:,0]
-		data_y_given = data[:,1]
-		data_y_fit = data[:,2]
 
-		self.set_spectrum_data_fit_result(data_x, data_y_fit, spectra_id = spectra_id, simulation_id = simulation_id)	
+		# load elemental fits
+		rese_filename = '%sx%s.dat' %(self.file_name[:3], file_id)
+		data = read_elemental_spectra_fit_file(self.path_dir + rese_filename)
 
+		self.set_elemental_spectrum_data_fit_result(data, spectra_id = spectra_id, simulation_id = simulation_id)
+
+		
 
 	def set_geometry_result(self, spectra_id = 0):
 		sim_group, file_id = self.get_simulation_group(spectra_id = spectra_id)
@@ -1536,7 +1615,42 @@ class NDF():
 
 
 
+def read_spectra_fit_file(spectra_file):
+	data = loadtxt(spectra_file, skiprows = 7)
 
+	data_x = data[:,0]
+	data_y_given = data[:,1]
+	data_y_fit = data[:,2]
+	
+	return data_x, data_y_given, data_y_fit
+
+def read_elemental_spectra_fit_file(spectra_file):
+	"""
+	Returns:
+		A dictionary of the form:
+		data = {'x': array([]),
+				'element1': array([]),
+				'element2': array([]),
+				'...'     : array([]),
+				'extra'   : array([])}
+	"""
+
+	with open(spectra_file, 'r') as file:
+		for _ in range(5):
+			file.readline()
+		
+		names = file.readline().split()
+	names.append('extra')    
+	
+	data_raw = genfromtxt(spectra_file, skip_header=7, skip_footer=1)
+	data_raw = data_raw.T
+	
+	data = {'x':data_raw[0]}
+	   
+	for n,y in zip(names, data_raw[1:]):
+		data[n] = y
+
+	return data
 
 
 def read_geo_file(geo_file):

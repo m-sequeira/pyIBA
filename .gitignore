@@ -5,7 +5,8 @@ __pycache__
 docs/build
 docs/source/jupyter_notebooks/*/.ipynb_checkpoints/
 docs/source/jupyter_notebooks/advanced_examples/*/.ipynb_checkpoints/
-
+build
+pyIBA.egg*
 *.pyc
 
 venv*
