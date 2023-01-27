@@ -861,7 +861,7 @@ class main_idf:
 				params['charge'] = self.get_charge(spectra_id = spectra_id)
 			except Exception as e:
 				print('Error: Missing data')
-				print_exc()
+				# print_exc()
 
 		elif technique == 'SIMS':
 			params = OrderedDict()
@@ -2013,6 +2013,11 @@ class main_idf:
 		else:
 			return entry
 
+	def get_idf_text(self):
+		xml_file = self.file.toprettyxml(indent='  ')
+		xml_file = [s for s in xml_file.split('\n') if s.strip() !='']
+
+		return xml_file
 
 
 	def print_idf_file(self, mode = 'pretty'):

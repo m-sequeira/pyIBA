@@ -260,7 +260,6 @@ class NDF():
 
 	def set_data_from_prf_file(self, prf_file, spectra_id = 0, simulation_id = None):
 		profile_dic = read_prf_file(prf_file)
-
 		if simulation_id != None:
 			self.set_profile_fit_result(profile_dic, spectra_id = spectra_id, simulation_id = simulation_id)
 		else:
