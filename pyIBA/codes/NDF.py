@@ -1247,11 +1247,13 @@ class NDF():
 
 
 		# load elemental fits
-		rese_filename = '%sx%s.dat' %(self.file_name[:3], file_id)
-		data = read_elemental_spectra_fit_file(self.path_dir + rese_filename)
+		try:
+			rese_filename = '%sx%s.dat' %(self.file_name[:3], file_id)
+			data = read_elemental_spectra_fit_file(self.path_dir + rese_filename)
 
-		self.set_elemental_spectrum_data_fit_result(data, spectra_id = spectra_id, simulation_id = simulation_id)
-
+			self.set_elemental_spectrum_data_fit_result(data, spectra_id = spectra_id, simulation_id = simulation_id)
+		except:
+			pass
 		
 
 	def set_geometry_result(self, spectra_id = 0):

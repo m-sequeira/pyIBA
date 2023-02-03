@@ -1186,7 +1186,7 @@ class main_idf:
 			self.change_node_value(params['depth'][1], molecule_element, 'depthmax')
 
 
-			if profile != None:
+			if profile != None and mol_id < len(profile['names']):
 				profile['names'][mol_id] = params['name']
 
 
@@ -1552,6 +1552,7 @@ class main_idf:
 		for i,mol in enumerate(elements_subentry):
 			# name = mol.getElementsByTagName('name')[0].firstChild.nodeValue 
 			name = get_xml_entry(mol, 'name')
+			if name is None: name = ''
 
 			if get_xml_entry(mol, 'density') not in ['', None]:
 				density = float(get_xml_entry(mol, 'density'))

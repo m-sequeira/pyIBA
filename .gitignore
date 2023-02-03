@@ -8,5 +8,5 @@ docs/source/jupyter_notebooks/advanced_examples/*/.ipynb_checkpoints/
 build
 pyIBA.egg*
 *.pyc
-
+pyIBA/tests/
 venv*

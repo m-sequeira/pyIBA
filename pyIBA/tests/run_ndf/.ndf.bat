@@ -1,5 +1,5 @@
 cd .
-wine /home/msequeira/Dropbox/CTN/Radiate/IDF_python/GUI/pyIBA-0.1.0/venv/lib/python3.8/site-packages/pyIBA/codes/NDF_11_MS/NDF.exe idf_example3.xml 3 0 1 0 1 1
+wine /home/user/IDF_python/IBAStudio/pyIBA/pyIBA/codes/NDF_11_MS/NDF.exe idf_example3.xml 3 0 1 0 1 1
 echo '
 
 Press enter to close:'

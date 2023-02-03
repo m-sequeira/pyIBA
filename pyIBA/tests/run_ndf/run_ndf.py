@@ -16,6 +16,10 @@
 
 
 # import the method to run NDF
+import sys
+from os.path import abspath
+path_pyIBA = abspath('../../../')
+sys.path.insert(0, path_pyIBA)
 from pyIBA import IDF
 from pyIBA.codes.NDF import run_ndf
 
