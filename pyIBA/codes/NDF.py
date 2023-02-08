@@ -155,11 +155,18 @@ class NDF():
 		self.change_node_value('energy' , xaxis_entry, 'ndf:axisname')
 		self.change_node_value('channel', xaxis_entry, 'ndf:axisunit')
 
+
 		data_x = [str(s) for s in data['x']]
 		x_string = ' '.join(data_x)
 		self.change_node_value(x_string, data_entry, 'ndf:x')
 
-
+		for k, yelement in data.items():
+			if k == 'x':
+				continue
+			try:
+				self.remove_nodes(data_entry, 'ndf:element')
+			except:
+				pass
 
 		for k, yelement in data.items():
 			if k == 'x':
@@ -1321,12 +1328,12 @@ class NDF():
 		print('\n----------- ' + name + ' -----------')
 		print(data)
 		
+
 		#save file name to input in spc file
 		self.dataxy_files.append(name)
 
 		#save the simulation group to input in spc file
 		self.simulation_group.append(self.get_simulation_group(spectra_id = spectra_id, simulation_id=simulation_id)[0])
-
 
 		
 	def write_geo(self, spectra_id = 0, path_dir = ''):
@@ -1367,7 +1374,6 @@ class NDF():
 
 		for k,p in pairs_fitparam.items():
 			value = p()
-#             print(value)
 			if isinstance(value, list):
 				if None not in value:
 					params[k] = '%s %s %s %s' %(params[k][0], params[k][1], value[0], value[1])

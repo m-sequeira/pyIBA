@@ -1987,6 +1987,13 @@ class main_idf:
 			XML Element: The last element of the tree just created
 		"""
 		element_parent = parent
+
+		if replace:
+			try:
+				self.remove_nodes(element_parent, tree[0])
+			except:
+				pass
+
 		for key in tree:
 			element = get_xml_section(element_parent, prefix + key)
 			if element is None:
