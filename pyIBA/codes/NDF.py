@@ -1003,7 +1003,8 @@ class NDF():
 		else:
 			ndf_entry = ndf_entry[0]
 		
-		param = get_xml_section(ndf_entry, 'ndf:calibrationparameter')
+		fit_param = get_xml_section(ndf_entry, 'ndf:fitparameters')[0]
+		param = get_xml_section(fit_param, 'ndf:calibrationparameter')
 
 		if param is None:
 			return [None, None]
@@ -1605,9 +1606,11 @@ class NDF():
 		self.str_files = []
 		self.prf_files = []
 		self.spc_files = []
+		self.simulation_group = []
 
-		self.write_dataxy(path_dir = path_dir)
-		self.write_geo(path_dir = path_dir)
+		for i in range(self.get_number_of_spectra()):
+			self.write_dataxy(path_dir = path_dir, spectra_id = i)
+			self.write_geo(path_dir = path_dir, spectra_id = i)
 		self.write_str(path_dir = path_dir)
 		self.write_prf(path_dir = path_dir)
 		self.write_spc(path_dir = path_dir)

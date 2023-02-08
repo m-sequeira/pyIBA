@@ -226,6 +226,7 @@ def uniformize_element_name(element):
 
 
 def normalize_list(list_original):
+	list_original = [int(i) for i in list_original]
 	list_sorted_index = sorted(range(len(list_original)), key=lambda k: list_original[k])
 	list_sorted = nparray(sorted(list_original))
 	list_sorted -= min(list_sorted) - 1

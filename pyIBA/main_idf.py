@@ -843,11 +843,11 @@ class main_idf:
 				'window': [100, 1500],
 				'projectile': 'He',
 				'beam_energy': 2000,
-				'beam_FWHM': 17,
+				'beam_FWHM': 20,
 				'geometry': 'ibm',
 				'angles': [0, 160], # theta_i, theta_s
-				'dect_solid': 7.2,
-				'energy_calib': [1, 80.7], # m,b 
+				'dect_solid': 10,
+				'energy_calib': [1, 0], # m,b 
 				'charge':1          
 			}
 			
@@ -1948,7 +1948,7 @@ class main_idf:
 		return element_parent
 	
 
-	def create_tree_on_parent(self, tree, parent, prefix = ''):
+	def create_tree_on_parent(self, tree, parent, prefix = '', replace = False):
 		"""Creates a tree of parents in the XML, starting from the *parent* element.
 		See also ``self.create_tree()``.
 
