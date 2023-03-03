@@ -67,6 +67,7 @@ class IDF(main_idf, NDF):
 		self.prf_files = []
 		self.spc_files = []
 		self.simulation_group = []
+		self.shared_charge = []
 		self.sim_version_history = []
 		
 	   
@@ -87,6 +88,7 @@ class IDF(main_idf, NDF):
 		self.prf_files = []
 		self.spc_files = []
 		self.simulation_group = []
+		self.shared_charge = []
 
 
 	def copy(self):

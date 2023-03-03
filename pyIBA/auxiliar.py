@@ -1,5 +1,5 @@
 from re import search
-from numpy import loadtxt, reshape, genfromtxt, array as nparray
+from numpy import loadtxt, reshape, genfromtxt, array as nparray, arange
 from fractions import Fraction
 
 
@@ -41,7 +41,7 @@ def get_xml_entry(parent, keyword, attribute = ''):
 
 
 def load_spectrum_from_file(data_file, mode = 'channels vs yield'):    
-	if mode == 'channels vs yield':
+	if mode.lower() == 'channels vs yield':
 		clean_lines = []
 		with open(data_file, 'r') as file:
 			for line in file.readlines():
@@ -52,7 +52,7 @@ def load_spectrum_from_file(data_file, mode = 'channels vs yield'):
 		
 		return data_x, data_y
 		
-	elif mode == '8 columns':
+	elif mode.lower() == '8 columns':
 		# find footer
 		nlinesfooter = 0
 		nrows = 1
@@ -72,8 +72,20 @@ def load_spectrum_from_file(data_file, mode = 'channels vs yield'):
 		data_x = range(0, len(data_y))
 		
 		return data_x, data_y
+
+	elif mode.lower() == 'potku':
+		with open(data_file, 'r') as file:
+			text = file.readlines()
+			data_start = text.index('[DATA]\n')
 		
-	elif mode == 'NDF simulation':
+		data_y = nparray([int(float(n.replace('/', ''))) for n in text[data_start+1:]])
+		data_x = arange(0, len(data_y))
+
+		
+		return data_x, data_y
+		
+		
+	elif mode.lower() == 'NDF simulation':
 		data = loadtxt(data_file, skiprows = 7)
 
 		data_x = data[:,0]
@@ -257,36 +269,36 @@ def check_its_number(number):
 
 def pretty_formula_ratio(name_ini):
 	try:
-	    name = name_ini.split()
+		name = name_ini.split()
 
-	    name_clean = name
-	    numbers = [float(n) for n in name[1::2]]
-	    fracs = []
-	    for n in numbers:
-	        fracs.append(Fraction(n).limit_denominator(100))
+		name_clean = name
+		numbers = [float(n) for n in name[1::2]]
+		fracs = []
+		for n in numbers:
+			fracs.append(Fraction(n).limit_denominator(100))
 
-	    max_dom = max([f.denominator for f in fracs])
-	    
-	    if max_dom > 30:
-	        numbers = ['%0.2f'%n for n in numbers]
-	    else:        
-	        for i,f in enumerate(fracs):
-	            mult = int(max_dom/f.denominator)
-	            comm_f = f.numerator*mult
-	            
-	            numbers[i] = comm_f
-	            
-	            
-	    for i,n in enumerate(numbers):
-	        name[2*i + 1] = str(n) 
-	            
-	    # if max_dom < 30:
-	    #     name_recover = name*1
-	    #     total = sum(numbers)
-	    #     for i,n in enumerate(numbers):
-	    #         name_recover[2*i + 1] = '%0.5f' %(n/total)
+		max_dom = max([f.denominator for f in fracs])
+		
+		if max_dom > 30:
+			numbers = ['%0.2f'%n for n in numbers]
+		else:        
+			for i,f in enumerate(fracs):
+				mult = int(max_dom/f.denominator)
+				comm_f = f.numerator*mult
+				
+				numbers[i] = comm_f
+				
+				
+		for i,n in enumerate(numbers):
+			name[2*i + 1] = str(n) 
+				
+		# if max_dom < 30:
+		#     name_recover = name*1
+		#     total = sum(numbers)
+		#     for i,n in enumerate(numbers):
+		#         name_recover[2*i + 1] = '%0.5f' %(n/total)
 
-	    
-	    return ' '.join(name)
+		
+		return ' '.join(name)
 	except:
 		return name_ini

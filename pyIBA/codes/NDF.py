@@ -11,17 +11,18 @@ class NDF():
 	"""Class focusing the NDF part of the IDF.
 	"""
 
-	def set_simulation_group(self, simulation_group, spectra_id = 0, simulation_id = 0):
+	def set_simulation_group(self, simulation_group, shared_charge = False, spectra_id = 0, simulation_id = 0):
 		simulation_entry = self.get_simulation(spectra_id=spectra_id, simulation_id = simulation_id)
 		
 		ndf_entry = self.get_section(simulation_entry, 'ndf:ndf', create_if_not_found=['ndf:ndf'])[0]
 		
 		self.change_node_value(simulation_group, ndf_entry, 'ndf:simulationgroup')
+		self.change_node_value(shared_charge, ndf_entry, 'ndf:sharedcharge')
 
 	def get_nspectra_in_simulation_group(self, simulation_group):
 		nspectra = 0
 		for i in range(self.get_number_of_spectra()):
-			sim_group = self.get_simulation_group(spectra_id = i)
+			sim_group = self.get_simulation_group(spectra_id = i)[0]
 			if sim_group == simulation_group:
 				nspectra += 1
 
@@ -31,9 +32,11 @@ class NDF():
 		simulation_entry = self.get_simulation(spectra_id=spectra_id, simulation_id = simulation_id)
 		
 		sim_group, file_id = get_xml_entry(simulation_entry, 'ndf:simulationgroup', attribute = 'id')
+		shared_charge = get_xml_entry(simulation_entry, 'ndf:sharedcharge')
+
 		
 		if sim_group is None:
-			return 1, '0101'
+			return 1, '0101', False
 		else:
 			### The code below is not acutally needed. The IDF2NDF saves the IDs into the 
 			### IDF file. Make sure you reload the file after run NDF.
@@ -44,8 +47,15 @@ class NDF():
 			# else: head_sim_0 = ''
 
 			# file_id = '%s%i%s%i' %(head_spectra_0, sim_group + 1, head_sim_0, spectra_id + 1)
-			
-			return sim_group, file_id
+			if shared_charge is not None:
+				if shared_charge.lower() == 'true':
+					shared_charge = True
+				else:
+					shared_charge = False
+			else:
+				shared_charge = True
+	
+			return sim_group, file_id, shared_charge
 
 
 ## Methods to set resultant spectra
@@ -189,7 +199,7 @@ class NDF():
 
 	def get_dataxy_fit(self, spectra_id = 0, simulation_id = 0):
 		technique = self.get_technique(spectra_id=spectra_id)
-		if technique in ['RBS', 'NRA', None]:
+		if technique in ['RBS', 'NRA', 'ERDA', None]:
 			type_data = 'ndf:simpledata'
 			x_tag = 'ndf:x'
 			y_tag = 'ndf:y'
@@ -226,7 +236,7 @@ class NDF():
 
 	def get_elemental_dataxy_fit(self, spectra_id = 0, simulation_id = 0):
 		technique = self.get_technique(spectra_id=spectra_id)
-		if technique in ['RBS', 'NRA', None]:
+		if technique in ['RBS', 'NRA', 'ERDA', None]:
 			type_data = 'ndf:elementaldata'
 			x_tag = 'ndf:x'
 			y_tag = 'ndf:y'
@@ -636,7 +646,8 @@ class NDF():
 			self.set_beam_energy_spread_fit_result(params['FWHM'], spectra_id = spectra_id, simulation_id = simulation_id)
 			self.set_incident_angle_fit_result(params['angles'][0], spectra_id = spectra_id, simulation_id = simulation_id)
 			self.set_scattering_angle_fit_result(params['angles'][1], spectra_id = spectra_id, simulation_id = simulation_id)
-			self.set_detector_solid_angle_fit_result(params['solidangle'], spectra_id = spectra_id, simulation_id = simulation_id)
+			if isinstance(params['solidangle'], list):
+				self.set_detector_solid_angle_fit_result(params['solidangle'], spectra_id = spectra_id, simulation_id = simulation_id)
 			self.set_energy_calibration_fit_result(*params['calibration'], spectra_id = spectra_id, simulation_id = simulation_id)
 
 
@@ -825,8 +836,15 @@ class NDF():
 		}
 		self.change_node_value(angle_change, detector_entry, 'ndf:solidangle', attributes = attributes)
 
-	
+	def set_detector_foil(self, material, thickness, spectra_id = 0, simulation_id = 0):
+		spectrum_entry= self.get_spectrum(spectra_id=spectra_id)
+		simulation_entry = self.get_simulation(spectra_id=spectra_id, simulation_id = simulation_id)
+		
+		foil_entry = self.create_tree_on_parent(['ndf','fitparameters','detection','detector', 'foil'], simulation_entry, prefix = 'ndf:')
+		self.change_node_value(material, foil_entry, 'ndf:material')
+		self.change_node_value(thickness, foil_entry, 'ndf:thickness')
 
+	
 	########################### To get parameters
 
 	def get_window_min(self, spectra_id = 0, simulation_id = 0):
@@ -961,9 +979,8 @@ class NDF():
 
 		return value
 
-	def get_angles_fitparam(self, spectra_id=0):
-		return [self.get_incident_angle_fitparam(spectra_id=spectra_id), self.get_scattering_angle_fitparam(spectra_id=spectra_id)] #, self.get_exit_angle_fitparam
-
+	def get_angles_fitparam(self, spectra_id=0, simulation_id = 0):
+		return [self.get_incident_angle_fitparam(spectra_id=spectra_id, simulation_id = simulation_id), self.get_scattering_angle_fitparam(spectra_id=spectra_id, simulation_id = simulation_id)] #, self.get_exit_angle_fitparam
 	
 	def get_charge_fitparam(self, spectra_id = 0, simulation_id = 0):
 		spec = self.get_spectrum(spectra_id=spectra_id)        
@@ -992,6 +1009,30 @@ class NDF():
 		value, units = get_xml_entry(ndf_entry, 'ndf:solidangle', attribute='units')
 		
 		return value
+
+	def get_detector_foil(self, spectra_id = 0, simulation_id = 0):
+		spec = self.get_spectrum(spectra_id=spectra_id)        
+		simulation_entry = self.get_simulation(spectra_id=spectra_id, simulation_id = simulation_id)    
+		ndf_entry = get_xml_section(simulation_entry, 'ndf:ndf')
+
+		if ndf_entry is None:
+			return [None, None]
+		else:
+			ndf_entry = ndf_entry[0]
+		
+		foil_entry = get_xml_section(ndf_entry, 'ndf:foil')
+		if foil_entry is None : return [None, None]
+		else: foil_entry = foil_entry[0]
+
+		value = get_xml_entry(foil_entry, 'ndf:material')
+		thickness = get_xml_entry(foil_entry, 'ndf:thickness')
+
+		if value == '': value = None
+		if thickness == '': thickness = None
+		
+		return [value, thickness]
+
+
 	
 	def get_energy_calibration_fitparam(self, spectra_id = 0, simulation_id = 0):
 		spec = self.get_spectrum(spectra_id=spectra_id)        
@@ -1159,7 +1200,7 @@ class NDF():
 
 
 	def set_model_adhoc_correction(self, element, parameters, spectra_id = 0, simulation_id = 0):
-		spectrum_entry= self.get_spectrum(spectra_id=spectra_id)
+		# spectrum_entry= self.get_spectrum(spectra_id=spectra_id)
 		simulation_entry = self.get_simulation(spectra_id=spectra_id, simulation_id = simulation_id)
 
 		models_entry = self.create_tree_on_parent(['ndf','fitparameters','models'], simulation_entry, prefix = 'ndf:')
@@ -1169,7 +1210,7 @@ class NDF():
 
 	
 	def get_model_adhoc_correction(self, spectra_id = 0, simulation_id = 0):
-		spec = self.get_spectrum(spectra_id=spectra_id)        
+		# spec = self.get_spectrum(spectra_id=spectra_id)        
 		simulation_entry = self.get_simulation(spectra_id=spectra_id, simulation_id = simulation_id)    
 		ndf_entry = get_xml_section(simulation_entry, 'ndf:ndf')
 
@@ -1188,6 +1229,38 @@ class NDF():
 
 		return code, parameter, model
 
+	def set_rutherford_cross(self, rutherford_bol, ebsfile_path, spectra_id = 0, simulation_id = 0):
+		simulation_entry = self.get_simulation(spectra_id=spectra_id, simulation_id = simulation_id)
+
+		cross_section = self.create_tree_on_parent(['ndf','fitparameters','models', 'crossection'], simulation_entry, prefix = 'ndf:')
+		cross_section_file_entry = self.create_tree_on_parent(['crossectionfile'], cross_section, prefix = 'ndf:')
+		
+		self.change_node_value(rutherford_bol, cross_section, 'ndf:Rutherford')
+		self.change_node_value(ebsfile_path, cross_section_file_entry, 'ndf:filename')
+		self.change_node_value(ebsfile_path.split('/')[-1].split('.')[-1], cross_section_file_entry, 'ndf:fileformat')
+		
+
+
+	def get_rutherford_cross(self, spectra_id = 0, simulation_id = 0):
+		simulation_entry = self.get_simulation(spectra_id=spectra_id, simulation_id = simulation_id)    
+		ndf_entry = get_xml_section(simulation_entry, 'ndf:ndf')
+
+		if ndf_entry is None:
+			return [None, None, None]
+		else:
+			ndf_entry = ndf_entry[0]
+
+		cross_entry = get_xml_section(ndf_entry, 'ndf:crossection')
+		if cross_entry is None : return [None, None]
+		else: cross_entry = cross_entry[0]
+
+		rutherford_bol = get_xml_entry(cross_entry, 'ndf:Rutherford')
+		ebsfile_path = get_xml_entry(cross_entry, 'ndf:filename')
+
+		if rutherford_bol == '': rutherford_bol = True
+		if ebsfile_path == '': ebsfile_path = None
+		
+		return [rutherford_bol == 'True', ebsfile_path]
 
 	####################  Methods for the NDF flags  ############################################
 
@@ -1242,50 +1315,50 @@ class NDF():
 		return ndf_results
 
 	
-	def set_spectra_result(self, spectra_id = 0, simulation_id = 0):
-		sim_group, file_id = self.get_simulation_group(spectra_id = spectra_id)
-		if sim_group == -1:
-			return
+	def set_spectra_result(self, spectra_id = 0):
+		for i in range(len(self.get_reactions(spectra_id = spectra_id))):
+			sim_group, file_id, _ = self.get_simulation_group(spectra_id = spectra_id, simulation_id = i)
+			if sim_group == -1:
+				return
 
-		# load total fit		
-		res_filename = '%sf%s.dat' %(self.file_name[:3], file_id)
-		data_x, data_y_given, data_y_fit = read_spectra_fit_file(self.path_dir + res_filename)
+			# load total fit
+			res_filename = '%sf%s.dat' %(self.file_name[:3], file_id)
+			data_x, data_y_given, data_y_fit = read_spectra_fit_file(self.path_dir + res_filename)
 
-		self.set_spectrum_data_fit_result(data_x, data_y_fit, spectra_id = spectra_id, simulation_id = simulation_id)
+			self.set_spectrum_data_fit_result(data_x, data_y_fit, spectra_id = spectra_id, simulation_id = i)
 
 
-		# load elemental fits
-		try:
-			rese_filename = '%sx%s.dat' %(self.file_name[:3], file_id)
-			data = read_elemental_spectra_fit_file(self.path_dir + rese_filename)
+			# load elemental fits
+			try:
+				rese_filename = '%sx%s.dat' %(self.file_name[:3], file_id)
+				data = read_elemental_spectra_fit_file(self.path_dir + rese_filename)
 
-			self.set_elemental_spectrum_data_fit_result(data, spectra_id = spectra_id, simulation_id = simulation_id)
-		except:
-			pass
-		
+				self.set_elemental_spectrum_data_fit_result(data, spectra_id = spectra_id, simulation_id = i)
+			except Exception as e:
+				# raise e
+				pass
+
 
 	def set_geometry_result(self, spectra_id = 0):
-		sim_group, file_id = self.get_simulation_group(spectra_id = spectra_id)
-		if sim_group == -1:
-			return
+		for i in range(len(self.get_reactions(spectra_id = spectra_id))):
+			sim_group, file_id, _ = self.get_simulation_group(spectra_id = spectra_id, simulation_id = i)
+			if sim_group == -1:
+				return
 
-		res_filename = '%sg%s.geo' %(self.file_name[:3], file_id)
+			res_filename = '%sg%s.geo' %(self.file_name[:3], file_id)
+			res_filename = self.path_dir + res_filename
 
-		res_filename = self.path_dir + res_filename
+			with open(res_filename, 'r') as file:
+				data = file.readlines()
+			
 
-		with open(res_filename, 'r') as file:
-			data = file.readlines()
-		
-		# self.results_geometry.clear()
-		# self.results_geometry.insertPlainText(''.join(data))
-
-		self.set_data_from_geo_file(res_filename, type_data = 'result', spectra_id = spectra_id)
+			self.set_data_from_geo_file(res_filename, type_data = 'result', spectra_id = spectra_id, simulation_id = i)
 
 		spc_file = self.file_name.split('.')[0] + '.spx'
 		self.set_data_from_spc_file(self.path_dir + spc_file)
 
 	def set_elements_result(self, spectra_id = 0):
-		sim_group, file_id = self.get_simulation_group(spectra_id = spectra_id)
+		sim_group, file_id, _ = self.get_simulation_group(spectra_id = spectra_id)
 		if sim_group == -1:
 			return
 
@@ -1300,7 +1373,7 @@ class NDF():
 
 
 	def set_profile_result(self, spectra_id = 0):
-		sim_group, file_id = self.get_simulation_group(spectra_id = spectra_id)
+		sim_group, file_id, _ = self.get_simulation_group(spectra_id = spectra_id)
 		if sim_group == -1:
 			return
 
@@ -1313,19 +1386,26 @@ class NDF():
 	
 ## Methods to write input files
 	
-	def write_dataxy(self, path = '', mode = 19, spectra_id = 0, simulation_id = 0, path_dir = ''):
+	def write_dataxy(self, name = '', mode = 19, spectra_id = 0, simulation_id = 0, path_dir = ''):
 		# modes correspond to the NDF file format index, 19 is double column with channels vs counts
-		xx, yy = self.get_dataxy(spectra_id=spectra_id)
-			
-		data = nparray([xx, yy])
-		data = data.T
-
-		if path == '':
+		if name == '':
 			name = '%s%i.dat' %(self.name, spectra_id+1)
 		else:
-			name = path
+			name = name
 
-		savetxt(path_dir + name, data, delimiter='  ', fmt=' %i   %f')
+		technique = self.get_technique(spectra_id=spectra_id)
+		if technique in ['RBS', 'NRA', 'ERDA', None]:
+			xx, yy = self.get_dataxy(spectra_id=spectra_id)
+
+			data = nparray([xx, yy])
+			data = data.T
+
+			savetxt(path_dir + name, data, delimiter='  ', fmt=' %i   %f')
+		elif technique == 'PIXE':
+			data = self.get_PIXE_file(spectra_id=spectra_id)
+			with open(path_dir + name, 'w') as file:
+				file.write(data)
+
 		print('\n----------- ' + name + ' -----------')
 		print(data)
 		
@@ -1334,110 +1414,135 @@ class NDF():
 		self.dataxy_files.append(name)
 
 		#save the simulation group to input in spc file
-		self.simulation_group.append(self.get_simulation_group(spectra_id = spectra_id, simulation_id=simulation_id)[0])
+		group, _, charge = self.get_simulation_group(spectra_id = spectra_id, simulation_id=simulation_id)
+		self.simulation_group.append(group)
+		self.shared_charge.append(charge)
 
 		
 	def write_geo(self, spectra_id = 0, path_dir = ''):
-		# spec = self.get_spectrum(spectra_id=spectra_id)
-
-		# params = {
-		#     'mode': 19,
-		#     'window': [100, 1500],
-		#     'projectile': ['He','He'],
-		#     'beam_energy': 2000,
-		#     'beam_FWHM': 17,
-		#     'geometry': 'ibm',
-		#     'angles': [0, 160], # theta_i, theta_s
-		#     'dect_solid': 7.2,
-		#     'energy_calib': [2.653, 80.7], # m,b           
-		# }
-
-		# params['projectile'] = self.get_beam_particles(spec)
-		# params['beam_energy'], params['beam_FWHM'] = self.get_beam_energy(spec)
-		# params['geometry'], params['angles'], _ = self.get_geometry_type(spec)
-		# params['dect_solid'] = self.get_detector(spec)
-		# params['energy_calib']= self.get_energy_calibration(spec)
-		
+		# list of parameters fixed for each spectrum (i.e. constant to all reactions)
 		pairs_fitparam = {
 			'beam_energy': self.get_beam_energy_fitparam,
 			'beam_FWHM': self.get_beam_energy_spread_fitparam,
 			'angles': self.get_angles_fitparam,
 			'dect_solid': self.get_detector_solid_angle_fitparam,
-			# 'energy_calib':self.get_energy_calibration_fitparam
 		}
+
+		params = self.get_geo_parameters(spectra_id = spectra_id)
+
+		#save some of the parameters to recover in the future
+		beam_energy = params['beam_energy']
+		beam_FWHM = params['beam_FWHM']
+		angles = params['angles']
+		dect_solid = params['dect_solid']
 		
-		params = self.get_geo_parameters(spectra_id=spectra_id)
-		params['window'] = [self.get_window_min(), self.get_window_max()]
+		reactions = self.get_reactions(spectra_id = spectra_id)
+		technique = self.get_technique(spectra_id = spectra_id)
 		
+		names = []
+		for i,r in enumerate(reactions):
+			params['energy_calib'] = self.get_energy_calibration(spectra_id = spectra_id, reaction_id = i)
+			params['window'] = [self.get_window_min(spectra_id = spectra_id, simulation_id = i), self.get_window_max(spectra_id = spectra_id, simulation_id = i)]
+			foil_params = self.get_detector_foil(spectra_id = spectra_id, simulation_id = i)
+			if None not in foil_params:
+				params['foil'] = 'foil ' + foil_params[1] + '\n' + foil_params[0].split('-')[1].strip()
 
-		if self.get_technique(spectra_id=spectra_id) == 'RBS':
-			params['projectile'] = [params['projectile'], params['projectile']]
-
-		for k,p in pairs_fitparam.items():
-			value = p()
-			if isinstance(value, list):
-				if None not in value:
-					params[k] = '%s %s %s %s' %(params[k][0], params[k][1], value[0], value[1])
-					
-			elif value is not None:
-				if k == 'beam_FWHM':
-					# add zeros for so that the FWHM is linear (pag. 29 of manual)
-					params[k] = '%s 0 %s 0' %(params[k], value)
-				else:
-					params[k] = '%s %s' %(params[k], value)
-					
-		
-
-		pairs_model = {
-			'pileup':self.get_model_pileup,
-			'double_scatter': self.get_model_doublescatter,
-			'straggling': self.get_model_straggling,
-			'energy_loss': self.get_model_energyloss,
-			'adhoc-correction': self.get_model_adhoc_correction
-		}
-		
-		for k,m in pairs_model.items():
-			code,param,_ = m()
-			
-			if (code is None):
-				continue	
+			rutherford_params = self.get_rutherford_cross(spectra_id = spectra_id, simulation_id = i)
+			if None not in rutherford_params:
+				if not rutherford_params[0]:
+					params['rutherford'] = 'ebsfiles ' + rutherford_params[1]
 
 
-			if k != 'adhoc-correction':
-				params[k] =  '%s %s' %(code, param)
+
+
+			params['beam_energy'] = beam_energy
+			params['beam_FWHM'] = beam_FWHM
+			params['angles'] = angles
+			params['dect_solid'] = dect_solid
+
+			if technique == 'NRA' and r['initialtargetparticle'] is not None:
+				params['projectile'] = [r['initialtargetparticle'] + ' ' + r['incidentparticle'] + ' ' + r['finaltargetparticle'] + ' ' + r['exitparticle'] + ' ' + r['reactionQ'],
+										r['exitparticle']]
+			elif technique == 'PIXE':
+				params['projectile'] = [r['incidentparticle'], 'X']
+				params['mode'] = 28
+				
+				# write calibration file
+				with open(path_dir + params['energy_calib'][0], 'w') as file:
+					file.write(''.join(params['energy_calib'][1]))
+				params['energy_calib'] = params['energy_calib'][0]                     
 			else:
-				params[k] =  '%s\n%s' %(code, param)
+				params['projectile'] = [r['incidentparticle'], r['exitparticle']]
+			
+			
+			for k,p in pairs_fitparam.items():
+				value = p(spectra_id = spectra_id, simulation_id = i)
+					
+				if isinstance(value, list):
+					if None not in value:
+						params[k] = '%s %s %s %s' %(params[k][0], params[k][1], value[0], value[1])
+				elif value is not None:
+					if k == 'beam_FWHM':
+						# add zeros for so that the FWHM is linear (pag. 29 of manual)
+						params[k] = '%s 0 %s 0' %(params[k], value)
+					else:
+						params[k] = '%s %s' %(params[k], value)
+				
 
 
-		calibration = self.get_energy_calibration_fitparam()
-		charge = self.get_charge_fitparam()
-		
-		params['energy_calib_m'] = 'flagvar_conv on'
-		params['energy_calib_b'] = 'flagvar_offset on'
-		params['charge'] = 'flagvar_charge on'
-		
-		if calibration[0] == 'False':
-			params['energy_calib_m'] = 'flagvar_conv off'
-		if calibration[1] == 'False':
-			params['energy_calib_b'] = 'flagvar_offset off'
-		if charge == 'False':
-			params['charge'] = 'flagvar_charge off'
+			pairs_model = {
+				'pileup':self.get_model_pileup,
+				'double_scatter': self.get_model_doublescatter,
+				'straggling': self.get_model_straggling,
+				'energy_loss': self.get_model_energyloss,
+				'adhoc-correction': self.get_model_adhoc_correction
+			}
+
+			for k,m in pairs_model.items():
+				code,param,_ = m(spectra_id = spectra_id, simulation_id = i)
+
+				if (code is None):
+					continue
 
 
-		name = '%s%i.geo' %(self.name, spectra_id+1)
-		with open(path_dir + name, 'w') as file:
-			print('\n----------- ' + name + ' -----------')
-			for key, param in params.items():
-				if isinstance(param, list):
-					param = [str(p) for p in param]
-					file.write(' '.join(param) + '\n')
-					print(' '.join(param) + '\t\t ' + key)
+				if k != 'adhoc-correction':
+					params[k] =  '%s %s' %(code, param)
 				else:
-					file.write(str(param) + '\n')
-					print(str(param) + '\t\t ' + key)
+					params[k] =  '%s\n%s' %(code, param)
 
-		#save file name to input in spc file
-		self.geo_files.append(name)
+
+			calibration = self.get_energy_calibration_fitparam(spectra_id = spectra_id, simulation_id = i)
+			charge = self.get_charge_fitparam(spectra_id = spectra_id, simulation_id = i)
+
+			params['energy_calib_m'] = 'flagvar_conv on'
+			params['energy_calib_b'] = 'flagvar_offset on'
+			params['charge'] = 'flagvar_charge on'
+
+			if calibration[0] == 'False':
+				params['energy_calib_m'] = 'flagvar_conv off'
+			if calibration[1] == 'False':
+				params['energy_calib_b'] = 'flagvar_offset off'
+			if charge == 'False':
+				params['charge'] = 'flagvar_charge off'
+
+
+			name = '%s_spec%i-%i_%s.geo' %(self.name, spectra_id+1, i, r['exitparticle'])
+			with open(path_dir + name, 'w') as file:
+				print('\n----------- ' + name + ' -----------')
+				for key, param in params.items():
+					if isinstance(param, list):
+						param = [str(p) for p in param]
+						file.write(' '.join(param) + '\n')
+						print(' '.join(param) + '\t\t\t ' + key)
+					else:
+						file.write(str(param) + '\n')
+						print(str(param) + '\t\t\t ' + key)
+
+			#save file name to input in spc file
+			names.append(name)
+		
+		self.geo_files.append(names)
+			
 
 		return name
 
@@ -1553,43 +1658,54 @@ class NDF():
 		with open(path_dir + name, 'w') as file:
 			group_before = -1
 			nspectra_group = 0
-
+			line = 0
+			main_file_line = 0
+			
 			for i in simulation_group_sorted:
 				if self.simulation_group[i] == -1:
 					continue
-
+					
 				d = self.dataxy_files[i]
-				g = self.geo_files[i]
+				
+				for j in range(len(self.get_reactions(spectra_id = i))):
+					line += 1
+					if self.simulation_group[i] != group_before:
+						strf = self.str_files[0].split('.')[0]
+						line = 1
+						if j == 0:
+							main_file_line = line
+					elif j == 0:
+						if self.shared_charge[i]:
+							strf = '[1]'
+						else:
+							strf = ''
+						main_file_line = line
+					else:
+						strf = '(%i)'%main_file_line
 
-				if self.simulation_group[i] != group_before:	
-					strf = self.str_files[0].split('.')[0]
-					nspectra_group = 0 
-				else:
-					strf = ''
-					nspectra_group += 1
-
-				geo = g.split('.')[0]
-				# strf = self.str_files[0].split('.')[0] 
-				file.write('%s %s %s %s\n' %(d, charge, geo, strf))
-				print('%s %s %s %s\n' %(d, charge, geo, strf))
-
-
-				# save file id for reading NDF outputs afterwards
-				id = ''
-				if simulation_group_normalized[i] < 10:
-					id = '0'
-				id += '%i'%simulation_group_normalized[i]
-				if nspectra_group < 10:
-					id += '0'
-				id += '%i'%(nspectra_group + 1)
-
-				simulation_entry = self.get_simulation(spectra_id=i, simulation_id = 0)		
-				ndf_entry = self.get_section(simulation_entry, 'ndf:ndf', create_if_not_found=['ndf:ndf'])[0]
-				attributes = {'id': id}
-				self.change_node_value(self.simulation_group[i], ndf_entry, 'ndf:simulationgroup', attributes = attributes)
+					g = self.geo_files[i][j]
+					geo = g.split('.')[0]
+					# strf = self.str_files[0].split('.')[0] 
+					file.write('%s %s %s %s\n' %(d, charge, geo, strf))
+					print('%s %s %s %s\n' %(d, charge, geo, strf))
 
 
-				group_before = self.simulation_group[i]
+					# save file id for reading NDF outputs afterwards
+					id = ''
+					if simulation_group_normalized[i] < 10:
+						id = '0'
+					id += '%i'%simulation_group_normalized[i]
+					if line < 10:
+						id += '0'
+					id += '%i'%(line)
+
+					simulation_entry = self.get_simulation(spectra_id=i, simulation_id = j)		
+					ndf_entry = self.get_section(simulation_entry, 'ndf:ndf', create_if_not_found=['ndf:ndf'])[0]
+					attributes = {'id': id}
+					self.change_node_value(self.simulation_group[i], ndf_entry, 'ndf:simulationgroup', attributes = attributes)
+
+
+					group_before = self.simulation_group[i]
 
 
 		self.spc_files.append(name)
@@ -1607,10 +1723,31 @@ class NDF():
 		self.prf_files = []
 		self.spc_files = []
 		self.simulation_group = []
+		self.shared_charge = []
+
+		
+		nspectra = self.get_number_of_spectra()
+
+		if nspectra == 1: 
+			print('Opening %s (%s spectrum):\n' %(self.name, nspectra))
+		else:
+			print('Opening %s (%s spectra):\n' %(self.name, nspectra))
+
+		print(self.user + '\n')
+		print('')
+
+		for l in self.description:
+			print(l)
+
 
 		for i in range(self.get_number_of_spectra()):
+			print('\n\n ==============  Spectrum  %i ==============' %(i+1))
+
 			self.write_dataxy(path_dir = path_dir, spectra_id = i)
 			self.write_geo(path_dir = path_dir, spectra_id = i)
+	
+		print('\n\n ==============  General Files ==============')
+
 		self.write_str(path_dir = path_dir)
 		self.write_prf(path_dir = path_dir)
 		self.write_spc(path_dir = path_dir)
@@ -1680,7 +1817,7 @@ def read_geo_file(geo_file):
 		params['angles'] = angles_params[0:2]
 		params['solidangle'] = solidangle_params[0]
 		params['calibration'] = lines[8].split()[0:2]
-		
+
 		params['window'] = lines[1].split()[-2:]
 		if len(energy_params)>1:
 			params['energy_fitparam'] = energy_params[1]
@@ -1690,7 +1827,6 @@ def read_geo_file(geo_file):
 			params['incident_angle_fitparam'] = angles_params[2]
 			params['scattering_angle_fitparam'] = angles_params[3]
 		if len(solidangle_params)>1:
-			print(solidangle_params)
 			params['solid_angle_fitparam'] = solidangle_params[1]
 			
 		

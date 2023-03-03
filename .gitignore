@@ -10,3 +10,4 @@ pyIBA.egg*
 *.pyc
 pyIBA/tests/
 venv*
+*.se

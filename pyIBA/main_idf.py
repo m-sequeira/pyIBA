@@ -1,7 +1,8 @@
 
 from numpy import array as nparray
 from numpy import savetxt, pi, loadtxt, genfromtxt
-from matplotlib.pyplot import subplots
+from matplotlib.pyplot import subplots, pause as pltpause
+
 
 from collections import OrderedDict
 from re import search
@@ -155,12 +156,33 @@ class main_idf:
 		if total_simulations >= nsimulations:
 			for i in range(total_simulations - nsimulations):
 				self.create_element(simulations_entry, 'simulation')
+
+	def remove_simulation_entry(self, spectra_id, simulation_id):
+		"""Deletes simulation[spectra_id, simulation_id]
+		
+		Args:
+			spectra_id (int): ID of the spectrum to delete.
+			simulation_id (int): ID of the simulation to delete.
+
+		"""
+
+		spectrum = self.get_spectrum(spectra_id=spectra_id)
+		simulations_entry = self.get_section(spectrum, 'simulations', 
+											   create_if_not_found = ['process', 'simulations'])[0]
+		# simulation_entries = self.get_section(simulations_entry, 'simulation', 
+											  # create_if_not_found = ['simulation'])
+
+		simulation_entry = self.get_simulation(spectra_id = spectra_id, simulation_id = simulation_id)
+		
+		simulations_entry.removeChild(simulation_entry)
+		print('Simulation deleted')
+
 				
 	def get_number_of_simulations(self, spectra_id = 0):
 		"""Gets the total number of simulations in spectrum[spectra_id]. 
 		
 		Args:
-			spectra_id (int, optional): Spectrum ID to get the number of simulations from.
+			spectra_id (int, optional:) Spectrum ID to get the number of simulations from.
 		
 		Returns:
 			int: Number of simulations.
@@ -201,7 +223,7 @@ class main_idf:
 		"""
 
 		technique = self.get_technique(spectra_id=spectra_id)
-		if technique in ['RBS', 'NRA', None]:
+		if technique in ['RBS', 'NRA', 'ERDA', None]:
 			type_data = 'simpledata'
 			x_tag = 'x'
 			y_tag = 'y'
@@ -230,6 +252,7 @@ class main_idf:
 			xx = nparray(xx).astype('float')
 
 		yy = nparray(yy).astype('float')
+
 
 		return xx, yy
 
@@ -449,6 +472,15 @@ class main_idf:
 			lines = ';'.join(file.readlines())
 		
 		self.change_node_value(lines, data_entry, 'filesource')
+
+	def get_PIXE_file(self, spectra_id = 0):
+		spec = self.get_spectrum(spectra_id = spectra_id)
+		if spec is None: return
+
+		data_file_text = self.get_section(spec, 'datafile')[0]
+		file_source = get_xml_entry(data_file_text, 'filesource')
+		
+		return file_source.replace(';','')
 
 	def set_SIMS_from_file(self, file_name, save_file_name = True, spectra_id = 0):
 		data_list = load_SIMS_file(file_name)
@@ -836,7 +868,7 @@ class main_idf:
 
 		technique = self.get_technique(spectra_id=spectra_id)
 		
-		if technique in ['RBS', 'NRA', 'PIXE', None]:
+		if technique in ['RBS', 'NRA', 'ERDA', 'PIXE', None]:
 			params = OrderedDict()
 			params = {
 				'mode': 19,
@@ -987,11 +1019,10 @@ class main_idf:
 	
 	#####################  Methods to set energy calibration  ######################################
 	
-	def set_energy_calibration(self, m, b, append = False, spectra_id = 0):
-		"""Set energy calibration assuming a linear relation between energy and channels::
+	def set_energy_calibration(self, m, b, append = False, spectra_id = 0, reaction_id = 0):
+		"""Set energy calibration assuming a linear relation between energy and channels:
 
-			E = m * channel + b
-		 
+			E = m * channel + b		 
 
 		Args:
 			m (float): m parameter in keV/channel
@@ -1000,29 +1031,43 @@ class main_idf:
 			spectra_id (int, optional): ID of the spectrum
 		"""
 		spec = self.get_spectrum(spectra_id=spectra_id)
-		energycalib_ele = self.get_section(spec, 'energycalibration', 
-												 create_if_not_found = ['calibrations','energycalibrations','energycalibration'])[0]
+
+		calibrations_ele = self.get_section(spec, 'energycalibrations', 
+												 create_if_not_found = ['calibrations','energycalibrations'])[0]
+						
+		calibrations = self.get_section(calibrations_ele, 'energycalibration', 
+												 create_if_not_found = ['energycalibration'])
+
+		if reaction_id >= len(calibrations):
+			return
+		calibration = calibrations[reaction_id]
+
+
+		# energycalib_ele = self.get_section(spec, 'energycalibration', 
+		# 										 create_if_not_found = ['calibrations','energycalibrations','energycalibration'])[0]
 		
-		self.change_node_value('energy', energycalib_ele, 'calibrationmode')
+		reactions = self.get_reactions(spectra_id=spectra_id)
+		if reactions is not None:
+			self.change_node_value(reactions[reaction_id]['exitparticle'], calibration, 'calibrationion')
+		self.change_node_value('energy', calibration, 'calibrationmode')
 		
 		
 		if append == False:
-			calibration_param_ele = self.get_section(energycalib_ele, 'calibrationparameters', 
+			calibration_param_ele = self.get_section(calibration, 'calibrationparameters', 
 				 create_if_not_found = ['calibrationparameters'])[0]
 		else:
-			calibration_param_ele = self.create_element(energycalib_ele, 'calibrationparameters')
+			calibration_param_ele = self.create_element(calibration, 'calibrationparameters')
 		
 		#remove old ones:
 		try:
 			self.remove_nodes(calibration_param_ele, 'calibrationparameter')
 		except:
 			pass
-		
+
 		attributes = {
 			'units': 'keV'
 		}
 		self.change_node_value(b, calibration_param_ele, 'calibrationparameter', attributes = attributes)
-		
 	
 		attributes = {
 			'units': 'keV/channel'
@@ -1030,7 +1075,8 @@ class main_idf:
 		self.change_node_value(m, calibration_param_ele, 'calibrationparameter', attributes = attributes,
 							  append = True)
 
-	def set_energy_calibration_file(self, file_path, spectra_id = 0):
+
+	def set_energy_calibration_file(self, file_path, append = False, spectra_id = 0):
 		"""Adds an energy calibration file to IDF. This is useful for instance in PIXE and SIMS. 
 		See also Examples section for more information.
 		
@@ -1052,15 +1098,19 @@ class main_idf:
 			 create_if_not_found = ['energycalibration','calibrationparameters'])[0]
 
 		#remove old ones:
-		try:
-			self.remove_nodes(calibration_param_ele, 'calibrationparameter')
-		except:
-			pass
+		if append == False:
+			try:
+				self.remove_nodes(calibration_param_ele, 'calibrationparameter')
+			except:
+				pass
 
-		
-		self.change_node_value(file_lines, calibration_param_ele, 'calibrationparameter')
+		attributes = {
+				'filename': file_path.split('/')[-1]
+			}
+		self.change_node_value(' '.join(file_lines[:-1]), calibration_param_ele, 'calibrationparameter', attributes = attributes)
 
-	def get_energy_calibration(self, spectra_id = 0):
+
+	def get_energy_calibration(self, spectra_id = 0, reaction_id = 0):
 		"""Gets the energy calibration parameters. See also ``self.set_energy_calibration()``.
 		
 		Args:
@@ -1071,14 +1121,18 @@ class main_idf:
 		"""
 		technique = self.get_technique(spectra_id=spectra_id)
 
-		if technique in ['RBS', 'NRA', None]:
+		if technique in ['RBS', 'NRA', 'ERDA', None]:
 			spec = self.get_spectrum(spectra_id = spectra_id)
 			if spec is None: return
 			
 			param_b = 0
 			param_m = 1
 			
-			calibration = get_xml_section(spec, 'energycalibration')[0]
+			calibration = get_xml_section(spec, 'energycalibration')
+			if reaction_id >= len(calibration): reaction_id = len(calibration) - 1
+
+			if calibration is None: return [None, None]
+			else: calibration = calibration[reaction_id]
 			if calibration is [None, None]: return
 			
 			param = get_xml_section(calibration, 'calibrationparameter')
@@ -1088,6 +1142,7 @@ class main_idf:
 			elif param[1].firstChild is None: return [None, None]
 
 			if '' in [p.firstChild.nodeValue for p in param]: return [None, None]
+			if None in [p.firstChild.nodeValue for p in param]: return [None, None]
 
 			
 			if param[0].getAttribute('units') == 'keV':
@@ -1098,8 +1153,17 @@ class main_idf:
 				param_b = float(param[1].firstChild.nodeValue)
 		
 		elif technique == 'PIXE':
-			param_m = 'ext. file'
-			param_b = '-'
+			spec = self.get_spectrum(spectra_id = spectra_id)
+			if spec is None: return
+			
+			calibration = get_xml_section(spec, 'energycalibration')
+
+			if calibration is None: return None
+			else: calibration = calibration[0]
+			
+			param_b, param_m = get_xml_entry(calibration, 'calibrationparameter', attribute = 'filename')
+			
+
 		elif technique == 'SIMS':
 			spec = self.get_spectrum(spectra_id = spectra_id)
 			if spec is None: return
@@ -1339,7 +1403,7 @@ class main_idf:
 
 
 
-	def set_reactions(self, reactions_dic, append = True, mode = 'reactionlist', spectra_id = 0):
+	def set_reactions(self, reactions_dic, append = True, mode = 'reactionlist', spectra_id = 0, linked_calibrations = True):
 		"""Sets the reaction list associated with the chosen technique (see ``self.set_technique()``).
 		Mode defines
 
@@ -1372,24 +1436,26 @@ class main_idf:
 		"""
 		spec = self.get_spectrum(spectra_id = spectra_id)
 		reactions = self.get_section(spec, mode, create_if_not_found=['reactions',mode])[0]
+		calibrations = self.get_section(spec, 'energycalibrations', create_if_not_found=['energycalibrations'])[0]
 
-		for key,items in reactions_dic.items():
-			reactions_dic[key] = capitalize_atom(items)
 		
 		if mode == 'reactionlist':
 			if append is False:
 				try:
 					self.remove_nodes(reactions, 'reaction')
+					if linked_calibrations: self.remove_nodes(calibrations, 'energycalibration')
 				except:
 					pass
 
 			reaction = self.create_element(reactions, 'reaction')
 
-			self.change_node_value(reactions_dic['initialtargetparticle'], reaction, 'initialtargetparticle')
-			self.change_node_value(reactions_dic['incidentparticle'], reaction, 'incidentparticle')
-			self.change_node_value(reactions_dic['exitparticle'], reaction, 'exitparticle')
-			self.change_node_value(reactions_dic['finaltargetparticle'], reaction, 'finaltargetparticle')
-			self.change_node_value(reactions_dic['reactionQ'], reaction, 'reactionQ', attributes={'units':'keV'})
+			self.change_node_value(capitalize_atom(reactions_dic['initialtargetparticle']), reaction, 'initialtargetparticle')
+			self.change_node_value(capitalize_atom(reactions_dic['incidentparticle']), reaction, 'incidentparticle')
+			self.change_node_value(capitalize_atom(reactions_dic['exitparticle']), reaction, 'exitparticle')
+			self.change_node_value(capitalize_atom(reactions_dic['finaltargetparticle']), reaction, 'finaltargetparticle')
+			self.change_node_value(capitalize_atom(reactions_dic['reactionQ']), reaction, 'reactionQ', attributes={'units':'keV'})
+
+			if linked_calibrations: self.create_element(calibrations, 'energycalibration')
 		elif mode == 'masslist':
 			try:
 				self.remove_nodes(reactions, 'reaction')
@@ -1401,7 +1467,9 @@ class main_idf:
 			
 		else:
 			print('Reaction mode not recognized')
-	
+
+
+
 	def get_reactions(self, spectra_id = 0):
 		"""Gets the reaction list of spectrum[spectra_id]
 
@@ -1453,16 +1521,28 @@ class main_idf:
 			for key, value in reaction.items():
 				if value == '':
 					reaction[key] = None
+				elif value == 'None':
+					reaction[key] = None
 
-			if (reaction['initialtargetparticle'] != None ) and (reaction['finaltargetparticle'] != None):
-				reaction['code'] = '%s(%s, %s)%s %0.2f' %(
-				reaction['initialtargetparticle'], reaction['incidentparticle'], reaction['exitparticle'], 
-				reaction['finaltargetparticle'], float(reaction['reactionQ'])*1e-3)
+
+			if reaction['reactionQ'] is None:
+				reaction['reactionQ'] = ''
 			else:
-				reaction['code'] = '%s %s' %(reaction['incidentparticle'], reaction['exitparticle'])
+				reaction['reactionQ'] = '%0.2f' %(float(reaction['reactionQ']))
+
+			if (reaction['initialtargetparticle'] is not None ) and (reaction['finaltargetparticle'] is not None):
+				reaction['code'] = '%s(%s, %s)%s %s' %(
+						reaction['initialtargetparticle'], reaction['incidentparticle'], reaction['exitparticle'], 
+						reaction['finaltargetparticle'], reaction['reactionQ'])
+			else:
+				if None in [reaction['incidentparticle'], reaction['exitparticle']]:
+					reaction['code'] = ''
+				else:
+					reaction['code'] = '(%s, %s)' %(reaction['incidentparticle'], reaction['exitparticle'])
+
 
 			reactions.append(reaction)
-			
+
 		return reactions
 	
 
@@ -2097,9 +2177,19 @@ class main_idf:
 				geo = self.get_geo_parameters(spectra_id = n)
 				name = self.get_spectrum_file_name(spectra_id = n)
 				technique = self.get_technique(spectra_id=n)
+				reactions = self.get_reactions(spectra_id=n)
+
+				geo.pop('mode')
+				geo.pop('window')
+				if technique == 'ERDA':
+					geo['detected ion'] = self.get_reactions(spectra_id=n)[0]['exitparticle']
 
 				print('-------- Spectrum %i (%s) --------' %(n, name))
-				print('Technique \t%s'%technique, end = '\n\n')
+				print('Technique \t%s'%technique)
+				for r in reactions:
+					print('\t\t', r['code'])
+
+				print('\n')
 				for k, p in geo.items():
 					if len(k) < 5:
 						fill = '\t\t'
@@ -2111,8 +2201,8 @@ class main_idf:
 				xx, yy = self.get_dataxy(spectra_id = n)
 				fig, ax = subplots(1,1)
 
-				if technique in ['RBS', 'NRA']:
-					ax.plot(xx, yy)
+				if technique in ['RBS', 'NRA', 'ERDA']:
+					ax.plot(xx[2:], yy[2:])
 					ax.set_xlabel('Energy (Channels)')
 				elif technique == 'PIXE':
 					ax.stem(xx, yy, basefmt = ' ')
@@ -2126,4 +2216,4 @@ class main_idf:
 					print('Plotting not supported for SIMS')
 
 				fig.tight_layout()
-	
+				pltpause(0.1)
