@@ -165,6 +165,13 @@ class NDF():
 		self.change_node_value('energy' , xaxis_entry, 'ndf:axisname')
 		self.change_node_value('channel', xaxis_entry, 'ndf:axisunit')
 
+		if data == None:
+			try:
+				self.remove_nodes(data_entry, 'ndf:x')
+				self.remove_nodes(data_entry, 'ndf:element')
+			except:
+				pass
+			return
 
 		data_x = [str(s) for s in data['x']]
 		x_string = ' '.join(data_x)
@@ -204,7 +211,7 @@ class NDF():
 			x_tag = 'ndf:x'
 			y_tag = 'ndf:y'
 		elif technique == 'PIXE':
-			type_data = 'linedata'
+			type_data = 'ndf:linedata'
 			x_tag = 'ndf:line'
 			y_tag = 'ndf:y'
 		elif technique == 'SIMS':
@@ -1331,12 +1338,12 @@ class NDF():
 			# load elemental fits
 			try:
 				rese_filename = '%sx%s.dat' %(self.file_name[:3], file_id)
-				data = read_elemental_spectra_fit_file(self.path_dir + rese_filename)
-
-				self.set_elemental_spectrum_data_fit_result(data, spectra_id = spectra_id, simulation_id = i)
+				data_ele = read_elemental_spectra_fit_file(self.path_dir + rese_filename)
 			except Exception as e:
-				# raise e
-				pass
+				data_ele = None
+
+			self.set_elemental_spectrum_data_fit_result(data_ele, spectra_id = spectra_id, simulation_id = i)
+			
 
 
 	def set_geometry_result(self, spectra_id = 0):
