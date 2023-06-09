@@ -641,7 +641,7 @@ class NDF():
 				technique = 'NRA'
 			
 			self.set_technique(technique, spectra_id=spectra_id)
-			self.set_reactions(params['reactions'], append=False, spectra_id=spectra_id)
+			self.set_reactions(params['reactions'], append=False, spectra_id=spectra_id, linked_calibrations = False)
 			
 			if add_models:
 				self.set_models_from_geo_file(geo_file, spectra_id=spectra_id)
@@ -901,7 +901,7 @@ class NDF():
 
 		energy_value, energy_units = get_xml_entry(ndf_entry, 'ndf:beamenergy', attribute='units')
 
-		if energy_value == '': energy_value = None
+		if energy_value in ['', '0']: energy_value = None
 
 		if energy_value != None:
 			energy_value = float(energy_value)
