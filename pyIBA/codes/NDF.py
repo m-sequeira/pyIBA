@@ -1051,14 +1051,19 @@ class NDF():
 		else:
 			ndf_entry = ndf_entry[0]
 		
-		fit_param = get_xml_section(ndf_entry, 'ndf:fitparameters')[0]
+		fit_param = get_xml_section(ndf_entry, 'ndf:fitparameters')
+		if fit_param is None:
+			return [True, True]
+		else:
+			fit_param = fit_param[0]
+
 		param = get_xml_section(fit_param, 'ndf:calibrationparameter')
 
 		if param is None:
-			return [None, None]
+			return [True, True]
 
 		if None in [p.firstChild for p in param]:
-			return [None, None]
+			return [True, True]
 
 		return [param[0].firstChild.nodeValue, param[1].firstChild.nodeValue]
 

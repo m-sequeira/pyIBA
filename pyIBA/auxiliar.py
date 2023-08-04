@@ -199,6 +199,42 @@ def simplify_atomic_formula(formula):
 	
 	return latex_atom(formula_clean)
 
+def pretty_formula_ratio(name_ini):
+	try:
+		name = name_ini.split()
+
+		name_clean = name
+		numbers = [float(n) for n in name[1::2]]
+		fracs = []
+		for n in numbers:
+			fracs.append(Fraction(n).limit_denominator(100))
+
+		max_dom = max([f.denominator for f in fracs])
+		
+		if max_dom > 30:
+			numbers = ['%0.2f'%n for n in numbers]
+		else:        
+			for i,f in enumerate(fracs):
+				mult = int(max_dom/f.denominator)
+				comm_f = f.numerator*mult
+				
+				numbers[i] = comm_f
+				
+				
+		for i,n in enumerate(numbers):
+			name[2*i + 1] = str(n) 
+				
+		# if max_dom < 30:
+		#     name_recover = name*1
+		#     total = sum(numbers)
+		#     for i,n in enumerate(numbers):
+		#         name_recover[2*i + 1] = '%0.5f' %(n/total)
+
+		
+		return ' '.join(name)
+	except:
+		return name_ini
+	
 
 def set_element_fit_symbol(formula):
 	formula_clean = formula[0]
@@ -267,38 +303,3 @@ def check_its_number(number):
 
 
 
-def pretty_formula_ratio(name_ini):
-	try:
-		name = name_ini.split()
-
-		name_clean = name
-		numbers = [float(n) for n in name[1::2]]
-		fracs = []
-		for n in numbers:
-			fracs.append(Fraction(n).limit_denominator(100))
-
-		max_dom = max([f.denominator for f in fracs])
-		
-		if max_dom > 30:
-			numbers = ['%0.2f'%n for n in numbers]
-		else:        
-			for i,f in enumerate(fracs):
-				mult = int(max_dom/f.denominator)
-				comm_f = f.numerator*mult
-				
-				numbers[i] = comm_f
-				
-				
-		for i,n in enumerate(numbers):
-			name[2*i + 1] = str(n) 
-				
-		# if max_dom < 30:
-		#     name_recover = name*1
-		#     total = sum(numbers)
-		#     for i,n in enumerate(numbers):
-		#         name_recover[2*i + 1] = '%0.5f' %(n/total)
-
-		
-		return ' '.join(name)
-	except:
-		return name_ini
