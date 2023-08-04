@@ -1863,7 +1863,7 @@ class main_idf:
 			Load an existing file, perform some changes to the parameters and save it again::
 
 				#load a IDF file
-				idf_file = IDF('path/to/file.xml')
+				idf_file = IDF('path/to/file.idf')
 
 				#change some parameters
 				idf_file.set_charge(5)
@@ -1871,10 +1871,10 @@ class main_idf:
 				#....
 				
 				#save file by overwriting the previous file (i.e. *save*)
-				idf_file.save_idf('path/to/file.xml')
+				idf_file.save_idf('path/to/file.idf')
 
 				#or if you want to create a new file (i.e. *save as*)
-				idf_file.save_idf('path/to/new_file.xml')
+				idf_file.save_idf('path/to/new_file.idf')
 
 		
 		Args:

@@ -11,3 +11,5 @@ pyIBA.egg*
 pyIBA/tests/
 venv*
 *.se
+
+*.zip
