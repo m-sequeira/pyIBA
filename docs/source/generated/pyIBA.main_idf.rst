@@ -21,6 +21,7 @@
       ~main_idf.create_tree
       ~main_idf.create_tree_on_parent
       ~main_idf.delete_spectrum
+      ~main_idf.get_PIXE_file
       ~main_idf.get_SIMS_data
       ~main_idf.get_SIMS_particles
       ~main_idf.get_all_spectra_filenames
@@ -34,6 +35,7 @@
       ~main_idf.get_energy_calibration
       ~main_idf.get_geo_parameters
       ~main_idf.get_geometry_type
+      ~main_idf.get_idf_text
       ~main_idf.get_max_concentration
       ~main_idf.get_max_depth
       ~main_idf.get_max_thickness
@@ -56,6 +58,7 @@
       ~main_idf.load_pixe_data_from_file
       ~main_idf.print_idf_file
       ~main_idf.remove_nodes
+      ~main_idf.remove_simulation_entry
       ~main_idf.save_idf
       ~main_idf.set_SIMS_calibration
       ~main_idf.set_SIMS_data
@@ -77,6 +80,7 @@
       ~main_idf.set_note
       ~main_idf.set_profile
       ~main_idf.set_reactions
+      ~main_idf.set_reactions_list
       ~main_idf.set_scattering_angle
       ~main_idf.set_spectrum_data
       ~main_idf.set_spectrum_data_from_file

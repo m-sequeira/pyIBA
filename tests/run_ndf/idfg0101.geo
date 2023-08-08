@@ -9,7 +9,7 @@ IBM
  0.228000E+01  0.105500E+03
 flagvar_charge off
 pile WG
-ds Normal 1
+ds Fast 1
 Chu 1
 SR03
 flagvar_conv off

@@ -1,4 +1,4 @@
-NDF v10.0b 16Jan21 rev 16Jan21 run 07/08/2023 18:22:38 Filename: idf02.res  
+NDF v10.0b 16Jan21 rev 16Jan21 run 08/08/2023 15:30:24 Filename: idf02.res  
 Any public outcome using these results must cite
   N.P. Barradas, C. Jeynes, NIMB 266 (2008) 1875.
 Used ZBL stopping powers. Should cite

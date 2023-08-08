@@ -6,7 +6,7 @@
 IBM
 30 140
 11
-None None
+2.28 105.5
 flagvar_charge off
 pile WG 
 ds Fast 1

@@ -25,8 +25,10 @@
       ~NDF.get_charge_fit_result
       ~NDF.get_charge_fitparam
       ~NDF.get_dataxy_fit
+      ~NDF.get_detector_foil
       ~NDF.get_detector_solid_angle_fit_result
       ~NDF.get_detector_solid_angle_fitparam
+      ~NDF.get_elemental_dataxy_fit
       ~NDF.get_elements_fit_result
       ~NDF.get_energy_calibration_fit_result
       ~NDF.get_energy_calibration_fitparam
@@ -41,6 +43,7 @@
       ~NDF.get_model_straggling
       ~NDF.get_nspectra_in_simulation_group
       ~NDF.get_profile_fit_result
+      ~NDF.get_rutherford_cross
       ~NDF.get_scattering_angle_fit_result
       ~NDF.get_scattering_angle_fitparam
       ~NDF.get_simulation_group
@@ -60,8 +63,10 @@
       ~NDF.set_data_from_prf_file
       ~NDF.set_data_from_spc_file
       ~NDF.set_data_from_str_file
+      ~NDF.set_detector_foil
       ~NDF.set_detector_solid_angle_fit_result
       ~NDF.set_detector_solid_angle_fitparam
+      ~NDF.set_elemental_spectrum_data_fit_result
       ~NDF.set_elements_fit_result
       ~NDF.set_elements_result
       ~NDF.set_energy_calibration_fit_result
@@ -78,6 +83,7 @@
       ~NDF.set_models_from_geo_file
       ~NDF.set_profile_fit_result
       ~NDF.set_profile_result
+      ~NDF.set_rutherford_cross
       ~NDF.set_scattering_angle_fit_result
       ~NDF.set_scattering_angle_fitparam
       ~NDF.set_simulation_group

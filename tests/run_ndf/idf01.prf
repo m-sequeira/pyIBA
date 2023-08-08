@@ -1,10 +1,13 @@
-  2
- 0.468856E+03  0.841636E+02  0.000000E+00  0.158364E+02
- 0.350188E+04  0.000000E+00  0.000000E+00  0.100000E+03
+  4
+ 0.473224E+03  0.746833E+02  0.253167E+02  0.000000E+00
+ 0.139441E+03  0.139779E+02  0.845282E+02  0.149391E+01
+ 0.387335E+03  0.578229E+00  0.970163E+02  0.240546E+01
+ 0.118724E+05  0.000000E+00  0.000000E+00  0.100000E+03
+rough
  thickness(1e15at/cm2), comp_molecules...
 molecules  3
-  7.506 Co0.3600pt0.6400
-  4.533 Si0.3333o0.6667
-  4.996 Si
-NDF v10.0b 16Jan21 rev 16Jan21 run 08/08/2023 11:51:16 Filename: idf01.prfbatch idf_example3.spc
+  7.506 Co0.36pt0.64
+  4.533 Si1o2
+  1.000 Si1
+NDF v10.0b 16Jan21 rev 16Jan21 run 08/08/2023 15:30:10 Filename: idf01.prfbatch idf_example3.spc
 str idf_example3.str

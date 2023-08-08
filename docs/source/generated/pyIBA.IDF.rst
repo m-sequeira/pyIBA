@@ -24,6 +24,7 @@
       ~IDF.delete_spectrum
       ~IDF.export_ndf_inputs
       ~IDF.get_NDF_run_option
+      ~IDF.get_PIXE_file
       ~IDF.get_SIMS_data
       ~IDF.get_SIMS_data_fit
       ~IDF.get_SIMS_particles
@@ -41,8 +42,10 @@
       ~IDF.get_dataxy
       ~IDF.get_dataxy_fit
       ~IDF.get_detector
+      ~IDF.get_detector_foil
       ~IDF.get_detector_solid_angle_fit_result
       ~IDF.get_detector_solid_angle_fitparam
+      ~IDF.get_elemental_dataxy_fit
       ~IDF.get_elements
       ~IDF.get_elements_fit_result
       ~IDF.get_elements_molecules_concentrations
@@ -53,6 +56,7 @@
       ~IDF.get_fit_results_entry
       ~IDF.get_geo_parameters
       ~IDF.get_geometry_type
+      ~IDF.get_idf_text
       ~IDF.get_incident_angle_fit_result
       ~IDF.get_incident_angle_fitparam
       ~IDF.get_max_concentration
@@ -75,6 +79,7 @@
       ~IDF.get_profile
       ~IDF.get_profile_fit_result
       ~IDF.get_reactions
+      ~IDF.get_rutherford_cross
       ~IDF.get_scattering_angle_fit_result
       ~IDF.get_scattering_angle_fitparam
       ~IDF.get_section
@@ -92,6 +97,7 @@
       ~IDF.print_idf_file
       ~IDF.remove_nodes
       ~IDF.remove_results_from_IDF
+      ~IDF.remove_simulation_entry
       ~IDF.save_idf
       ~IDF.set_NDF_run_option
       ~IDF.set_PIXE_data_fit_result
@@ -113,9 +119,11 @@
       ~IDF.set_data_from_prf_file
       ~IDF.set_data_from_spc_file
       ~IDF.set_data_from_str_file
+      ~IDF.set_detector_foil
       ~IDF.set_detector_solid_angle
       ~IDF.set_detector_solid_angle_fit_result
       ~IDF.set_detector_solid_angle_fitparam
+      ~IDF.set_elemental_spectrum_data_fit_result
       ~IDF.set_elements
       ~IDF.set_elements_fit_result
       ~IDF.set_elements_result
@@ -144,6 +152,8 @@
       ~IDF.set_profile_fit_result
       ~IDF.set_profile_result
       ~IDF.set_reactions
+      ~IDF.set_reactions_list
+      ~IDF.set_rutherford_cross
       ~IDF.set_scattering_angle
       ~IDF.set_scattering_angle_fit_result
       ~IDF.set_scattering_angle_fitparam

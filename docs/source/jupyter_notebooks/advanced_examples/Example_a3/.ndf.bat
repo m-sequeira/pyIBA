@@ -5,3 +5,4 @@ echo 'Finished' > run_status.res
 echo '
 
 Press enter to close:'
+read line
