@@ -220,6 +220,9 @@ class NDF():
 			return [0], [0]
 
 		simulation_entry = self.get_simulation(spectra_id = spectra_id, simulation_id=simulation_id)
+		if simulation_entry is None:
+			return [0], [0]
+
 		total_fit_entry = get_xml_section(simulation_entry, type_data)
 		if total_fit_entry is None: 
 			return [0], [0]

@@ -977,8 +977,9 @@ class main_idf:
 		if target_id == 'All':
 			for i in range(0, nspectra):
 				self.set_technique(technique_master, spectra_id=i)
+				self.set_reactions_list(reactions_master, spectra_id= i)		
 				self.set_geo_parameters(params_master, spectra_id = i)
-				self.set_reactions_list(reactions_master, spectra_id= i)			
+
 		else:
 			self.set_technique(technique_master, spectra_id=target_id)
 			self.set_geo_parameters(params_master, spectra_id = target_id)		
