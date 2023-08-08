@@ -1,0 +1,8 @@
+ Starting date and time: 08/08/2023 11:51:31
+
+ Initialising parameters sample   1: idf_example31.dat                       
+
+ Allocated variables based on: nspec=  2 ngeom=  1 nmols= 3 nels= 4
+ nelstot_final= 4 inlays= 2000 icross= 1000 innstop=20000
+ nchcompr_max= 1024 nener_foil= 2000
+

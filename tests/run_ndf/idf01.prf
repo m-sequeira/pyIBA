@@ -1,0 +1,10 @@
+  2
+ 0.468856E+03  0.841636E+02  0.000000E+00  0.158364E+02
+ 0.350188E+04  0.000000E+00  0.000000E+00  0.100000E+03
+ thickness(1e15at/cm2), comp_molecules...
+molecules  3
+  7.506 Co0.3600pt0.6400
+  4.533 Si0.3333o0.6667
+  4.996 Si
+NDF v10.0b 16Jan21 rev 16Jan21 run 08/08/2023 11:51:16 Filename: idf01.prfbatch idf_example3.spc
+str idf_example3.str
