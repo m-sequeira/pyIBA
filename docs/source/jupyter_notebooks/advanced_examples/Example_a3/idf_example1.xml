@@ -54,12 +54,12 @@
 								
 								
 							<calibrationparameter units="keV">105.5</calibrationparameter><calibrationparameter units="keV/channel">2.28</calibrationparameter></calibrationparameters>
-						</energycalibration>
-					</energycalibrations>
+						<calibrationion>4He</calibrationion></energycalibration>
+					<energycalibration/></energycalibrations>
 				</calibrations>
 				<reactions>
 					<technique/>
-				</reactions>
+				<reactionlist><reaction><initialtargetparticle></initialtargetparticle><incidentparticle>4He</incidentparticle><exitparticle>4He</exitparticle><finaltargetparticle></finaltargetparticle><reactionQ units="keV"></reactionQ></reaction></reactionlist></reactions>
 				<data>
 					<simpledata>
 						<xaxis>

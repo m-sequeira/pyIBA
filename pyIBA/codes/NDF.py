@@ -2019,37 +2019,29 @@ def read_str_file(str_file):
 	return params
 
 
-
-
-
-
-
-
  # added ad-hoc, should be implemented on its on class!
 
 from subprocess import Popen
 from os import getcwd
 from platform import platform
-
-# def run_IDF_viewer():
-# 	result = Popen(['python3', '/home/msequeira/Dropbox/CTN/Radiate/IDF_python/GUI/test/NDF_gui.py'])
+from time import sleep
 
 
-def run_ndf(idf_file):
+def run_ndf(idf_file, close_window = False):
 	print('Opening NDF...')
 
 	# self.save()
 
 	OSname = platform()
 	if 'Linux' in OSname:
-		run_ndf_linux(idf_file)
+		run_ndf_linux(idf_file, close_window = close_window)
 	elif 'Windows' in OSname:
-		run_ndf_windows(idf_file)
+		run_ndf_windows(idf_file, close_window = close_window)
 
 
-def run_ndf_windows(idf_file):
+def run_ndf_windows(idf_file, close_window = False):
 	shell = 'start cmd.exe /c'
-	ndf_path = 'pyIBA\\codes\\NDF_11_MS\\NDF.exe'
+	ndf_path = '\\codes\\NDF_11_MS\\NDF.exe'
 
 	# get flags:
 	options = ['fitmethod','channelcompreesion','convolute','distribution','smooth','normalisation']
@@ -2059,31 +2051,30 @@ def run_ndf_windows(idf_file):
 
 	ndf_flags = ' '.join(code)
 
-
 	path = idf_file.path_dir
 	file = idf_file.file_name
 
-	cwd = idf_file.executable_dir# getcwd()
+	cwd = idf_file.executable_dir
 	cmd = cwd + ndf_path + ' ' + file + ' ' + ndf_flags
 	path_bat = path + 'ndf.bat'
 
-	# print(cmd)
 	with open(path_bat,'w') as file:
 		file.write('@echo off \n')
 		file.write('cd ' + path + '\n')
+		file.write('echo \'Run started...\' > run_status.res \n')
 		file.write(cmd + '\n\n\n')
+		file.write('echo \'Finished\' > run_status.res \n')
 		file.write('echo \n')
 		file.write('echo Press enter to close:\n')
-		file.write('pause >null')
+		if close_window == False:
+			file.write('pause >null')
 
-	# run = subprocess.Popen(['bash', 'ndf.bat'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)#, text=True) #, shell = True
 	run = Popen(shell + ' ' + path_bat, shell = True)#, text=True) #
 	
-def run_ndf_linux(idf_file):
+def run_ndf_linux(idf_file, close_window = False):
 	shell = 'gnome-terminal'
 	wine = 'wine'
 	ndf_path = 'codes/NDF_11_MS/NDF.exe'
-	#/media/msequeira/Backup3/Windows10/IDF_python/GUI/
 
 	# get flags:
 	options = ['fitmethod','channelcompreesion','convolute','distribution','smooth','normalisation']
@@ -2102,37 +2093,43 @@ def run_ndf_linux(idf_file):
 		ndf_flags = ' '.join(code)
 
 
-	path = idf_file.path_dir
-	
+	path = idf_file.path_dir	
 	file = idf_file.file_name
 
 	if path in ['/', '']:
 		path = '.'
 
-
 	cwd = idf_file.executable_dir
 	cmd = wine + ' ' + cwd + ndf_path + ' ' + file + ' ' + ndf_flags
 	path_bat = path + 'ndf.bat'
-	# print(path)
-	# print(cmd)
+	
 	with open(path_bat,'w') as file:
 		file.write('cd ' + path + '\n')
+		file.write('echo \'Run started...\' > run_status.res \n')
 		file.write(cmd + '\n')
+		file.write('echo \'Finished\' > run_status.res \n')
 		file.write('echo \'\n\nPress enter to close:\'\n')
-		file.write('read line')
+		if close_window == False:
+			file.write('read line')
 
-	# run = subprocess.Popen(['bash', 'ndf.bat'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)#, text=True) #, shell = True
 	run = Popen(shell + ' -- bash ' + path_bat, shell = True)#, text=True) #
-	# run = subprocess.Popen('bash ' + path_bat, shell = True)#, text=True) #
-	
-	# self.output, self.errors = run.communicate()
-
-	# i = 0
-	# while run.poll() is not None:
-	# 	print(str(i) + output + ' ', flush = True)
-	# 	print(run.poll())
-	# 	print(errors)
-	# 	sleep(2)
-	# 	i+=1
 
 
+def check_simulations_running(idf_file, block = False):
+	while True:
+		sleep(1)	
+		try:
+			with open(idf_file.path_dir + 'run_status.res') as file:
+				status = file.readline()
+				running_state = 'Run' in status
+		except:
+			running_state = False
+
+		if not block or not running_state:
+			print('Finished')
+			break
+		else:
+			print('.', end = '')
+
+
+	return running_state

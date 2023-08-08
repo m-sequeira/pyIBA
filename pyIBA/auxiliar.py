@@ -40,7 +40,7 @@ def get_xml_entry(parent, keyword, attribute = ''):
 
 
 
-def load_spectrum_from_file(data_file, mode = 'channels vs yield'):    
+def load_spectrum_from_file(data_file, mode = 'channels vs yield'):
 	if mode.lower() == 'channels vs yield':
 		clean_lines = []
 		with open(data_file, 'r') as file:
@@ -85,7 +85,7 @@ def load_spectrum_from_file(data_file, mode = 'channels vs yield'):
 		return data_x, data_y
 		
 		
-	elif mode.lower() == 'NDF simulation':
+	elif mode.lower() == 'ndf simulation':
 		data = loadtxt(data_file, skiprows = 7)
 
 		data_x = data[:,0]

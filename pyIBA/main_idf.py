@@ -959,9 +959,9 @@ class main_idf:
 			else:
 				item(params[key], spectra_id = spectra_id)
 				
-				
+			
 		
-	def unify_geo_parameters(self, master_id = 0):
+	def unify_geo_parameters(self, master_id = 0, target_id = 'All'):
 		"""Copies the geometry parameters from one spectrum (with index *master_id*) to 
 		all other spectra in the IDF file.
 		
@@ -971,11 +971,21 @@ class main_idf:
 		nspectra = self.get_number_of_spectra()
 		
 		params_master = self.get_geo_parameters(spectra_id = master_id)
-		for i in range(0, nspectra):
-			self.set_geo_parameters(params_master, spectra_id = i)
+		technique_master = self.get_technique(spectra_id = master_id)
+		reactions_master = self.get_reactions(spectra_id = master_id)
+
+		if target_id == 'All':
+			for i in range(0, nspectra):
+				self.set_technique(technique_master, spectra_id=i)
+				self.set_geo_parameters(params_master, spectra_id = i)
+				self.set_reactions_list(reactions_master, spectra_id= i)			
+		else:
+			self.set_technique(technique_master, spectra_id=target_id)
+			self.set_geo_parameters(params_master, spectra_id = target_id)		
+			self.set_reactions_list(reactions_master, spectra_id= target_id)			
 
 
-
+				
 
 	####################  Methods to set the detector specifications ################################
 	
@@ -1469,6 +1479,40 @@ class main_idf:
 			print('Reaction mode not recognized')
 
 
+	def set_reactions_list(self, reactions, spectra_id=0):
+		"""
+		Sets an entire list of reactions to the specified spectrum. 
+		
+		The method initializes the spectrum with the first reaction from the list without appending 
+		(i.e., replacing any existing reactions). Subsequent reactions in the list are appended to the spectrum.
+		
+		This is a convenience method built atop the base `set_reactions` method to handle lists of reactions 
+		efficiently without requiring multiple explicit calls by the user.
+		
+		Args:
+			reactions (list of dictionaries): A list of reaction dictionaries. Each dictionary should adhere 
+											to the structure expected by the `set_reactions` method.
+			spectra_id (int, optional): ID of the spectrum to which the reactions are being added. Defaults to 0.
+		
+		Examples:
+			To set multiple reactions for a given spectrum:
+			
+			reactions_list = [
+				{'initialtargetparticle': 'Be', ...},
+				{'initialtargetparticle': 'H', ...},
+				...
+			]
+			obj.set_reactions_list(reactions_list, spectra_id=5)
+		"""
+		
+		# Initialize the spectrum with the first reaction without appending
+		self.set_reactions(reactions[0], append=False, spectra_id=spectra_id)
+		
+		# Append the subsequent reactions from the list to the spectrum
+		for r in reactions[1:]:
+			self.set_reactions(r, spectra_id=spectra_id)
+
+	
 
 	def get_reactions(self, spectra_id = 0):
 		"""Gets the reaction list of spectrum[spectra_id]
@@ -2178,8 +2222,13 @@ class main_idf:
 				name = self.get_spectrum_file_name(spectra_id = n)
 				technique = self.get_technique(spectra_id=n)
 				reactions = self.get_reactions(spectra_id=n)
+				if reactions is None:
+					reactions = []
+				try:
+					geo.pop('mode')
+				except Exception as e:
+					pass
 
-				geo.pop('mode')
 				geo.pop('window')
 				if technique == 'ERDA':
 					geo['detected ion'] = self.get_reactions(spectra_id=n)[0]['exitparticle']
