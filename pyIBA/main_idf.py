@@ -1929,7 +1929,7 @@ class main_idf:
 			IDF: Returns the existing IDF object
 		"""
 		with open(filename, 'w') as file:
-			self.file.writexml(file)
+			self.file.writexml(file, encoding='utf-8')
 
 		self.path_dir = '/'.join(filename.split('/')[:-1]) + '/'
 		if self.path_dir == '/':
