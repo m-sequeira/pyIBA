@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><idf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://idf.schemas.itn.pt" xmlns:idf="http:/idf.schemas.itn.pt" xmlns:ndf="http:/ndf.schemas.itn.pt" xsi:schemaLocation="http:/idf.schemas.itn.pt idfv1.xsd http://ndf.schemas.itn.pt ndfv1.xsd">
+<?xml version="1.0" encoding="utf-8"?><idf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://idf.schemas.itn.pt" xmlns:idf="http:/idf.schemas.itn.pt" xmlns:ndf="http:/ndf.schemas.itn.pt" xsi:schemaLocation="http:/idf.schemas.itn.pt idfv1.xsd http://ndf.schemas.itn.pt ndfv1.xsd">
 	<users>
 		<user>Miguel Sequeira</user>
 	</users>
