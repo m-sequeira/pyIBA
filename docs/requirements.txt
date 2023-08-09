@@ -2,4 +2,5 @@ sphinx>=1.4
 ipykernel
 nbsphinx
 sphinx_gallery
+sphinx-book-theme
 .
