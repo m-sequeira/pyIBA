@@ -22,7 +22,7 @@ copyright = '2022, Miguel Sequeira'
 author = 'Miguel Sequeira'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.0'
+release = '1.0b'
 
 
 # -- General configuration ---------------------------------------------------
@@ -74,11 +74,13 @@ exclude_patterns = ['jupyter_notebooks/ignore_nb',
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'classic' #'agogo' #'classic' #'sphinxdoc' #'alabaster'
+html_theme = 'sphinx_book_theme' #'nature', 'agogo' #'classic' #'sphinxdoc' #'alabaster'
 html_theme_options = {
     # "headerbg": "linear-gradient(0deg, rgba(81,120,187,1) 26%, rgba(27,40,62,1) 100%)"
-    "stickysidebar": True,
-    "sticky_navigation": True
+    #"stickysidebar": True,
+    #"sticky_navigation": True
+	"repository_url": "https://github.com/m-sequeira/pyIBA",
+    "use_repository_button": True,
 }
 
 

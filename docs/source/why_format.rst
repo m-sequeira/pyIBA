@@ -44,7 +44,7 @@ At this point, serious loss of information may incur. The what, why, who, when a
 .. figure:: images/actual_state_6.PNG
    :height: 300
 
-Therefore, a change in the management of data is urgently needed in the IBA community. In this context, the IDF (IBA Data Format) has been accepted by the `RADIATE EU Project <https://www.ionbeamcenters.eu/radiate/>`_ members as the standardised data format for IBA.
+Therefore, a change in the management of data is urgently needed in the IBA community. In this context, the IDF (IBA Data Format), a XML schema, has been accepted by the `RADIATE EU Project <https://www.ionbeamcenters.eu/radiate/>`_ members as the standardised data format for IBA. However, until now, the format has seen little adoption by the community, partially because handling XML files is a tedious and time-consuming task. This makes updating the existing data acquisition and analysis software an unattractive investment, even though there are obvious gains in having a unified data format.
 
 Instead of having information scattered through multiple locations, we leave the accelerator with a single IDF file. This file contains the spectra produced during the experiment, the experimental parameters of each measurement, the sample details and any event that might have occurred. 
   
